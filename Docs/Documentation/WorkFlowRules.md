@@ -101,7 +101,7 @@ flowchart TD
   feature-JY-PlayerMovement      (O)
   playermovement                 (X)
   ```
-- 작업 착수 전 현재 브랜치를 확인한다. `main`, `main-develop` 브랜치인 경우 feature 브랜치로 변경할 때까지 작업을 거부한다.
+- 작업 착수 전 현재 브랜치를 확인한다. `main`, `main-develop` 브랜치인 경우, 한 번 더 인지를 시켜준다. 그럼에도 진행한다고 한다면 진행한다.
 
 ### 작업 진행
 - 소스 코드 작업 시 `Docs\SourceCode\` 하위 문서와 `Docs\Claude\TechSpec.md`를 따른다.

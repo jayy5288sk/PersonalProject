@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-[Serializable]
-public class UnitData
+[CreateAssetMenu(fileName = "NewUnitData", menuName = "Scriptable Object/Unit/Unit Data")]
+public class UnitData : ScriptableObject
 {
     [SerializeField] private int _id;
     [SerializeField] private string _unitName;
@@ -12,7 +12,7 @@ public class UnitData
     [SerializeField] private string _basicWeapon;
     [SerializeField] private string _expandedWeapon;
     
-    public int Id => _id;
+    public int ID => _id;
     public string UnitName => _unitName;
     public int MaxHealth => _maxHealth;
     public int MaxEnergy => _maxEnergy;
@@ -20,8 +20,8 @@ public class UnitData
     public string BasicWeapon => _basicWeapon;
     public string ExpandedWeapon => _expandedWeapon;
     
-    public UnitData(int id, string unitName, int maxHealth, int maxEnergy, 
-                    int movementPoints, string basicWeapon, string expandedWeapon)
+    public void SetData(int id, string unitName, int maxHealth, int maxEnergy, 
+                        int movementPoints, string basicWeapon, string expandedWeapon)
     {
         _id = id;
         _unitName = unitName;

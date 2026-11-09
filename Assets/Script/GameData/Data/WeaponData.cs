@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-[Serializable]
-public class WeaponData
+[CreateAssetMenu(fileName = "NewWeaponData", menuName = "Scriptable Object/Weapon/Weapon Data")]
+public class WeaponData : ScriptableObject
 {
     [SerializeField] private int _id;
     [SerializeField] private string _weaponName;
@@ -20,7 +20,7 @@ public class WeaponData
     public string RangeShape => _rangeShape;
     public int RequireEn => _requireEn;
 
-    public WeaponData(int id, string weaponName, float attackDamage, float minRange,
+    public void SetData(int id, string weaponName, float attackDamage, float minRange,
                       float maxRange, string rangeShape, int requireEn)
     {
         _id = id;

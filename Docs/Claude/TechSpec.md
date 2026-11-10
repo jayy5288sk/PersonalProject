@@ -33,8 +33,10 @@
 
 ## 외부 데이터
 - 유닛, 무기, 맵 데이터는 코드 밖 데이터 파일로 분리하며, 코드 수정 없이 반영되어야 한다.
-- 데이터 형식: 미정 (JSON(`JsonUtility`) 또는 CSV 중 택 1, 1일차 확정)
-- 데이터 저장 위치: 미정 (빌드 환경에서도 읽히는 경로여야 함. 예: `StreamingAssets`)
+- 데이터 형식: TSV (유닛·무기·맵 공통)
+  - 외부 시트 URL에서 TSV를 내려받아 Newtonsoft.Json(`JArray`/`JObject`)으로 변환한 뒤, ID가 일치하는 ScriptableObject에 적용한다.
+  - `JsonUtility`는 최상위 배열을 다루지 못해 사용하지 않는다.
+- 데이터 저장 위치: 외부 시트 URL (각 Loader의 Inspector에 지정)
 - 데이터 스키마(필드 구성)의 원본: 미정 (스키마 문서 작성 후 경로 기재)
 
 ## 유저 입력 시스템

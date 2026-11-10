@@ -120,7 +120,7 @@ public class WeaponDataLoader : MonoBehaviour
            !int.TryParse(values[2], out int attackDamage) ||
            !int.TryParse(values[3], out int minRange) ||
            !int.TryParse(values[4], out int maxRange)||
-           !int.TryParse(values[6], out int rangeShape))
+           !int.TryParse(values[6], out int requireEn))
         {
             Debug.Log("숫자 변환에 실패했다");
             return null;
@@ -135,7 +135,7 @@ public class WeaponDataLoader : MonoBehaviour
             ["minRange"] = minRange,
             ["maxRange"] = maxRange,
             ["rangeShape"] = values[5],
-            ["requireEn"] = rangeShape
+            ["requireEn"] = requireEn
         };
     }
 

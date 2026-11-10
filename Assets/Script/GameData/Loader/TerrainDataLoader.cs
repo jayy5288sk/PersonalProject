@@ -29,7 +29,7 @@ public class TerrainDataLoader : MonoBehaviour
 
             if (_terrainDataById.ContainsKey(terrain.ID))
             {
-                Debug.Log("무기 ID 중복");
+                Debug.Log("지형 ID 중복");
                 continue;
             }
             

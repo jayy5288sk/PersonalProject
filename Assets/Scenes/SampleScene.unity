@@ -632,7 +632,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HeadDataLoader
   _unitDataLoader: {fileID: 567438049}
   _weaponDataLoader: {fileID: 661945168}
-  _terrainDataLoader: {fileID: 0}
+  _terrainDataLoader: {fileID: 959987772}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

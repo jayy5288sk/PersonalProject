@@ -6,22 +6,22 @@ public class WeaponData : ScriptableObject
 {
     [SerializeField] private int _id;
     [SerializeField] private string _weaponName;
-    [SerializeField] private float _attackDamage;
-    [SerializeField] private float _minRange;
-    [SerializeField] private float _maxRange;
+    [SerializeField] private int _attackDamage;
+    [SerializeField] private int _minRange;
+    [SerializeField] private int _maxRange;
     [SerializeField] private string _rangeShape;
     [SerializeField] private int _requireEn;
 
     public int ID => _id;
     public string WeaponName => _weaponName;
-    public float AttackDamage => _attackDamage;
-    public float MinRange => _minRange;
-    public float MaxRange => _maxRange;
+    public int AttackDamage => _attackDamage;
+    public int MinRange => _minRange;
+    public int MaxRange => _maxRange;
     public string RangeShape => _rangeShape;
     public int RequireEn => _requireEn;
 
-    public void SetData(int id, string weaponName, float attackDamage, float minRange,
-                      float maxRange, string rangeShape, int requireEn)
+    public void SetData(int id, string weaponName, int attackDamage, int minRange,
+                        int maxRange, string rangeShape, int requireEn)
     {
         _id = id;
         _weaponName = weaponName;

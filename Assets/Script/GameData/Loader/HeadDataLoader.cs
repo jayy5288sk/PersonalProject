@@ -17,7 +17,9 @@ public class HeadDataLoader : MonoBehaviour
     public IEnumerator LoadExternalDataRoutine()
     {
         Coroutine unitRoutine = StartCoroutine(_unitDataLoader.LoadUnitTable());
+        Coroutine weaponRoutine = StartCoroutine(_weaponDataLoader.LoadWeaponTable());
         
         yield return unitRoutine;
+        yield return weaponRoutine;
     }
 }

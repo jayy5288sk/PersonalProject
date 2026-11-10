@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 public class UnitDataLoader : MonoBehaviour
@@ -24,11 +23,13 @@ public class UnitDataLoader : MonoBehaviour
         foreach (UnitData unit in _units)
         {
             if (unit == null)
+            {
                 continue;
+            }
 
             if (_unitDataById.ContainsKey(unit.ID))
             {
-                Debug.Log("ID가 중복된다");
+                Debug.Log("유닛 ID가 중복된다");
                 continue;
             }
             
@@ -40,7 +41,7 @@ public class UnitDataLoader : MonoBehaviour
     {
         if (_unitTsvUrl == null || _unitTsvUrl.Trim() == "") 
         {
-            Debug.Log("URL이 비어있다");
+            Debug.Log("유닛 URL이 비어있다");
             yield break;
         }
         
@@ -69,7 +70,7 @@ public class UnitDataLoader : MonoBehaviour
         // 줄 단위 분리
         string[] lines = tsvContext.Split
         (
-            new char[] { '\r', '\n' },
+            new [] { '\r', '\n' },
             StringSplitOptions.RemoveEmptyEntries
         );
         
@@ -148,7 +149,7 @@ public class UnitDataLoader : MonoBehaviour
 
             if (_unitDataById.TryGetValue(id, out UnitData unit))
             {
-                Debug.Log("적용 성공");
+                Debug.Log("UnitData 적용 성공");
                 unit.SetData
                 (
                     id,
@@ -162,7 +163,7 @@ public class UnitDataLoader : MonoBehaviour
             }
             else
             {
-                Debug.Log("값을 가져오지 못했다");
+                Debug.Log("UnitData 값을 가져오지 못했다");
             }
         }
     }

@@ -15,6 +15,9 @@ public class UnitDataLoader : MonoBehaviour
     [SerializeField] private List<UnitData> _units = new();
     private Dictionary<int, UnitData> _unitDataById = new();
 
+    // 무기 데이터 가져오기
+    private WeaponData _weaponData;
+    
     /// <summary>
     /// Dictionary인 _unitDataById에 등록
     /// </summary>

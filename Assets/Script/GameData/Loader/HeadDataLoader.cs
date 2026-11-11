@@ -9,6 +9,7 @@ public class HeadDataLoader : MonoBehaviour
     [SerializeField] private TerrainDataLoader _terrainDataLoader;
     [SerializeField] private MapDesignDataLoader _mapDesignDataLoader;
     [SerializeField] private MapGenerator _mapGenerator;
+    [SerializeField] private UnitSpawnDataLoader _unitSpawnDataLoader;
     
     private void Awake() => LoadData();
 
@@ -23,11 +24,13 @@ public class HeadDataLoader : MonoBehaviour
         Coroutine weaponRoutine = StartCoroutine(_weaponDataLoader.LoadWeaponTable());
         Coroutine terrainRoutine = StartCoroutine(_terrainDataLoader.LoadTerrainTable());
         Coroutine mapRoutine = StartCoroutine(_mapDesignDataLoader.LoadMapTable());
+        Coroutine unitSpawnRoutine = StartCoroutine(_unitSpawnDataLoader.LoadUnitSpawnTable());
         
         yield return unitRoutine;
         yield return weaponRoutine;
         yield return terrainRoutine;
         yield return mapRoutine;
+        yield return unitSpawnRoutine;
         
         _mapGenerator.GenerateMap(_mapDesignDataLoader.MapArray);
     }

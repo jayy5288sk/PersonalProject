@@ -616,6 +616,7 @@ Transform:
   - {fileID: 567438048}
   - {fileID: 661945167}
   - {fileID: 959987771}
+  - {fileID: 2061123888}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1417565948
@@ -633,6 +634,52 @@ MonoBehaviour:
   _unitDataLoader: {fileID: 567438049}
   _weaponDataLoader: {fileID: 661945168}
   _terrainDataLoader: {fileID: 959987772}
+  _mapDesignDataLoader: {fileID: 2061123887}
+--- !u!1 &2061123886
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2061123888}
+  - component: {fileID: 2061123887}
+  m_Layer: 0
+  m_Name: MapDesignDataLoader
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2061123887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061123886}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e85d186fd8d4d8a4a9492c865be4b7f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MapDesignDataLoader
+  _mapTsvUrl: https://docs.google.com/spreadsheets/d/1IdpHrRG9OCjbC6euPdm8ktoVfJ6e3ZHGoZg01Jqd9Gc/export?format=tsv&gid=212403317
+--- !u!4 &2061123888
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2061123886}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1417565947}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

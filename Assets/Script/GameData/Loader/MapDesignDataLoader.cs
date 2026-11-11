@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json.Linq;
@@ -37,7 +38,7 @@ public class MapDesignDataLoader : MonoBehaviour
             
             // 최종적으로 보여줄 맵에 적용
             MapArray = convertJArray;
-            Debug.Log("맵 디자인 데이터 적용 성공");
+            Debug.Log($"({MapArray.Count}x{((JArray)MapArray[0]).Count}) 크기의 맵 디자인 데이터 적용 성공");
         }
     }
     

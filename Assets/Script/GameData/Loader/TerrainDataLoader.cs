@@ -159,4 +159,20 @@ public class TerrainDataLoader : MonoBehaviour
             }
         }
     }
+
+    /// <summary>
+    /// 지형 로더에 해당 ID의 SO를 가져오기 위한 함수
+    /// </summary>
+    public bool TryGetTerrainData(int id, out TerrainData terrainData)
+    {
+        if (_terrainDataById.TryGetValue(id, out terrainData))
+        {
+            return true;
+        }
+        else
+        {
+            Debug.Log($"{id}번의 지형 데이터를 갖고 오지 못했다");
+            return false;
+        }
+    }
 }

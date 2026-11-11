@@ -15,6 +15,7 @@ public class TerrainData : ScriptableObject
     public string TileName => _tileName;
     public bool IsMoveAvailable => _isMoveAvailable;
     public int RequireMove => _requireMove;
+    public GameObject TilePrefab => _tilePrefab;
     
     public void SetTerrainData(int id, string tileName, bool isMoveAvailable, int requireMove)
     {

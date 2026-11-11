@@ -171,7 +171,7 @@ public class TerrainDataLoader : MonoBehaviour
         }
         else
         {
-            Debug.Log($"{id}번의 지형 데이터를 갖고 오지 못했다");
+            Debug.Log($"ID {id}번의 지형 데이터를 갖고 오지 못했다");
             return false;
         }
     }

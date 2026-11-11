@@ -30,7 +30,7 @@ public class MapGenerator : MonoBehaviour
                 }
                 
                 // 지형 설치 위치
-                Vector3 position = new Vector3(j * TERRAIN_SIZE, 0, i * TERRAIN_SIZE);
+                Vector3 position = new Vector3(j * TERRAIN_SIZE, 0.5f, (rowCount - 1 - i) * TERRAIN_SIZE);
                 
                 // 위치에 설치
                 Instantiate(currentTerrain, position, Quaternion.identity, transform);

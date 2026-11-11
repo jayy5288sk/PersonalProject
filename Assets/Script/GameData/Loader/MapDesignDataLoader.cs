@@ -1,15 +1,16 @@
 using System;
 using System.Collections;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json.Linq;
 
 public class MapDesignDataLoader : MonoBehaviour
 {
-    [SerializeField] private string _mapTsvUrl;
+    private string _mapTsvUrl = SECOND_STAGE_MAP;
     
     private const int INVALID_TERRAIN_ID = -1;
+    private const string FIRST_STAGE_MAP = "https://docs.google.com/spreadsheets/d/1IdpHrRG9OCjbC6euPdm8ktoVfJ6e3ZHGoZg01Jqd9Gc/export?format=tsv&gid=212403317";
+    private const string SECOND_STAGE_MAP = "https://docs.google.com/spreadsheets/d/1IdpHrRG9OCjbC6euPdm8ktoVfJ6e3ZHGoZg01Jqd9Gc/export?format=tsv&gid=1450338949";
     
     public JArray MapArray { get; private set; }
 

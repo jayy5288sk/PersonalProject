@@ -8,6 +8,7 @@ public class HeadDataLoader : MonoBehaviour
     [SerializeField] private WeaponDataLoader _weaponDataLoader;
     [SerializeField] private TerrainDataLoader _terrainDataLoader;
     [SerializeField] private MapDesignDataLoader _mapDesignDataLoader;
+    [SerializeField] private MapGenerator _mapGenerator;
     
     private void Awake() => LoadData();
 
@@ -27,5 +28,7 @@ public class HeadDataLoader : MonoBehaviour
         yield return weaponRoutine;
         yield return terrainRoutine;
         yield return mapRoutine;
+        
+        _mapGenerator.GenerateMap(_mapDesignDataLoader.MapArray);
     }
 }

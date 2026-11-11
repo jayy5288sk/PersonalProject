@@ -205,8 +205,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.35096544, y: -0.32606325, z: 0.13186125, w: -0.86782414}
-  m_LocalPosition: {x: -26.475279, y: 212.79446, z: -27.529478}
+  m_LocalRotation: {x: 0.13735722, y: -0.85808873, z: 0.39436865, w: 0.2988147}
+  m_LocalPosition: {x: 10.224461, y: 7.611743, z: 11.848468}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -383,6 +383,52 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!1 &482074012
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 482074014}
+  - component: {fileID: 482074013}
+  m_Layer: 0
+  m_Name: MapGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &482074013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 482074012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 866b5e3db80ee18469f89ee2f523fbf3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MapGenerator
+  _terrainDataLoader: {fileID: 959987772}
+  _defaultTilePrefab: {fileID: 7198779258288197547, guid: 3a0819c01a0e3774a9b11ed81408c887, type: 3}
+--- !u!4 &482074014
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 482074012}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &567438047
 GameObject:
   m_ObjectHideFlags: 0
@@ -635,6 +681,7 @@ MonoBehaviour:
   _weaponDataLoader: {fileID: 661945168}
   _terrainDataLoader: {fileID: 959987772}
   _mapDesignDataLoader: {fileID: 2061123887}
+  _mapGenerator: {fileID: 482074013}
 --- !u!1 &2061123886
 GameObject:
   m_ObjectHideFlags: 0
@@ -664,7 +711,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e85d186fd8d4d8a4a9492c865be4b7f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapDesignDataLoader
-  _mapTsvUrl: https://docs.google.com/spreadsheets/d/1IdpHrRG9OCjbC6euPdm8ktoVfJ6e3ZHGoZg01Jqd9Gc/export?format=tsv&gid=212403317
 --- !u!4 &2061123888
 Transform:
   m_ObjectHideFlags: 0
@@ -687,4 +733,5 @@ SceneRoots:
   - {fileID: 330585546}
   - {fileID: 410087041}
   - {fileID: 832575519}
+  - {fileID: 482074014}
   - {fileID: 1417565947}

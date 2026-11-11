@@ -169,4 +169,20 @@ public class UnitDataLoader : MonoBehaviour
             }
         }
     }
+    
+    /// <summary>
+    /// 유닛 로더에 해당 ID의 SO를 가져오기 위한 함수
+    /// </summary>
+    public bool TryGetUnitData(int id, out UnitData unitData)
+    {
+        if (_unitDataById.TryGetValue(id, out unitData))
+        {
+            return true;
+        }
+        else
+        {
+            Debug.Log($"ID {id}번의 유닛 데이터를 갖고 오지 못했다");
+            return false;
+        }
+    }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -16,4 +17,40 @@ public class TileSelector : MonoBehaviour
     private Vector2Int _currentSection = new(-1, -1); // 맵 어느 구역인지(열, 행)
     private Plane _groundCheckPlane; // 마우스 Ray 계산용 바닥 평면
     private GameObject _groundHighlight; // 지정된 프리팹(_highlightPrefab) 복사본 용도
+
+    private void Awake() => Init();
+
+    private void OnEnable() => BindEvents();
+
+    private void OnDisable() => UnbindEvents();
+    
+    private void Update()
+    {}
+
+    private void BindEvents()
+    {
+        _mapGenerator.OnMapGenerateCompleted += Foo;
+    }
+
+    private void UnbindEvents()
+    {
+        _mapGenerator.OnMapGenerateCompleted -= Foo;
+    }
+
+    private void Foo()
+    {
+        //_groundCheckPlane = new Plane(Vector3.up, );
+        _isMapGenerated = true;
+    }
+
+    private void Init()
+    {
+        _camera = Camera.main;
+        
+        _groundHighlight = Instantiate(_highlightPrefab, 
+                                       _highlightPrefab.transform.position, 
+                                       _highlightPrefab.transform.rotation);
+        
+        _groundHighlight.SetActive(false);
+    }
 }

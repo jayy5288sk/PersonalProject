@@ -43,7 +43,6 @@ public class MapGenerator : MonoBehaviour
         }
         
         // 설치 완료 이벤트 발생
-        Debug.Log($"{RowCount} x {ColumnCount}");
         OnMapGenerateCompleted?.Invoke();
     }
 }

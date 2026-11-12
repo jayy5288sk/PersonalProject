@@ -3,6 +3,7 @@
 ## 1. 구현 일자
 - 일자: 2026-11-10 (화요일)
 - 갱신: 2026-11-11 (수요일), 맵 로더·생성기 구현 내용 반영 (구현 상세: `Docs\ImplementDocs\261110FeatureMapDesign.md`)
+- 갱신: 2026-11-12 (목요일), 유닛 스폰 반영 (구현 상세: `Docs\ImplementDocs\261112FeatureUnitSpawn.md`)
 
 ## 2. Core Contents
 - 구현 방향: 지형 TSV 시트 → JSON (지형 정의) + 지형 SO (Cube 프리팹) → 스테이지별 맵 TSV (칸별 Terrain ID) → `JArray` (행의 배열) → 시트 크기만큼 그리드 생성
@@ -15,7 +16,7 @@
   | 지형 정의 (TerrainData) | TSV → JSON → SO 적용 | ID, TileName, RequireMove, IsMoveAvailable | 공통 |
   | 지형 외형 | SO | ID별 Cube 프리팹 (시트에서 받지 않음) | 공통 |
   | 맵 디자인 | 스테이지별 TSV → `JArray` 보관 | 셀마다 Terrain ID, 시트 격자 = 맵 격자, 헤더 없음 (A1부터 ID) | 스테이지별 |
-  | 스폰 위치 | 맵 시트와 별도 TSV | 유닛 배치 좌표 (미구현) | 스테이지별 |
+  | 스폰 위치 | 맵 시트와 별도 TSV → `JArray` 보관 | 격자형, 칸마다 유닛 ID, 빈칸·0 = 유닛 없음 | 스테이지별 |
 - What : 맵 크기 - 시트의 행 수와 1행의 칸 수에서 읽는다.
 - What : 좌표 규칙 - `Docs\Claude\TechSpec.md`의 "칸 인덱스 ↔ 월드 좌표 변환 규칙" 참고
 - What : 이동 판정 - `IsMoveAvailable`로 진입 가능 여부를 먼저 검사하고, 가능할 때만 `RequireMove`만큼 이동력을 소모한다. 진입 불가 지형의 `RequireMove` 값은 사용하지 않는다. (F-05에서 구현)
@@ -26,7 +27,9 @@
 - Where: `Assets/Script/GameData/Loader/MapDesignDataLoader.cs`, `Assets/Script/ResourceGenerator/MapGenerator.cs`
 - Where: `Assets/Script/GameData/Loader/TerrainDataLoader.cs`, `Assets/Script/GameData/Data/TerrainData.cs`
 - Where: `Assets/ScriptableObject/Terrain/` (지형 SO), `Assets/Prefab/Map/MapTiles/` (지형 프리팹)
+- Where: `Assets/Script/GameData/Loader/UnitSpawnDataLoader.cs`, `Assets/Script/ResourceGenerator/UnitGenerator.cs` (유닛 스폰)
 - Tune : 지형별 이동 비용·진입 가능 여부 (지형 TSV 시트), 지형 외형 (지형 SO), 칸 배치 (맵 TSV 시트), 맵 시트 URL (`MapDesignDataLoader` Inspector), 칸 크기 (`MapGenerator.TERRAIN_SIZE`)
+- Tune : 유닛 배치 (스폰 TSV 시트), 스폰 시트 URL (`UnitSpawnDataLoader` Inspector)
 
 ## 4. 선택 이유
 - 지형 정의와 외형 분리: 스프레드시트는 Unity 에셋(프리팹)을 참조할 수 없으므로, 수치는 시트에서 받고 외형만 SO에 둔다. SO에는 이동 관련 수치를 두지 않아 값의 출처를 하나로 유지한다.
@@ -43,8 +46,10 @@
 |------|---------------|------------------------------------------|------------------------------------|
 | F-03 | 맵 데이터 로드 | 스테이지 맵 시트를 칸별 지형 ID 표로 보관   | `Assets/Script/GameData/Loader/`   |
 | F-03 | 맵 그리드 생성 | 칸 ID에 맞는 지형 타일을 XZ 평면에 배치     | `Assets/Script/ResourceGenerator/` |
+| F-03 | 스폰 데이터 로드 | 스폰 시트를 칸별 유닛 ID 표로 보관        | `Assets/Script/GameData/Loader/`   |
+| F-03 | 유닛 배치      | 맵 생성 직후 칸 ID에 맞는 유닛 생성         | `Assets/Script/ResourceGenerator/` |
 
 ---
 
 ## TODO
-- 미정의 ID 칸을 진입 불가로 기록 (F-05), SO의 `TilePrefab`이 비었을 때 기본 프리팹 대체, 스폰 위치 TSV, 스테이지 선택 시 맵 URL 보관 위치 (F-12), 스테이지 메타 정보 필요 여부
+- 미정의 ID 칸을 진입 불가로 기록 (F-05), SO의 `TilePrefab`이 비었을 때 기본 프리팹 대체, 스테이지 선택 시 맵 URL 보관 위치 (F-12), 스테이지 메타 정보 필요 여부

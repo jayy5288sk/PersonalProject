@@ -459,6 +459,62 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 341aa16f67bca6544b56f507a0621e6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TerrainDataLoader
+--- !u!114 &1643269308 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 160789832547833786, guid: 9aaee2b8e86215747a6fd1654aa99aaa, type: 3}
+  m_PrefabInstance: {fileID: 2913626579283294008}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 257f118b508b39a4286675ca5425bc7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitDataLoader
+--- !u!1 &1670166386
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1670166388}
+  - component: {fileID: 1670166387}
+  m_Layer: 0
+  m_Name: UnitGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1670166387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1670166386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8739a1d4ac57e94bb9f8980eabd5131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitGenerator
+  _unitDataLoader: {fileID: 1643269308}
+--- !u!4 &1670166388
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1670166386}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.54572, y: 0, z: 4.57601}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1813674481
 GameObject:
   m_ObjectHideFlags: 0
@@ -618,6 +674,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 482074013}
     - target: {fileID: 5379219458991155985, guid: 9aaee2b8e86215747a6fd1654aa99aaa, type: 3}
+      propertyPath: _unitGenerator
+      value: 
+      objectReference: {fileID: 1670166387}
+    - target: {fileID: 5379219458991155985, guid: 9aaee2b8e86215747a6fd1654aa99aaa, type: 3}
       propertyPath: _unitSpawnDataLoader
       value: 
       objectReference: {fileID: 1813674483}
@@ -641,4 +701,5 @@ SceneRoots:
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 120751654295980951}
+  - {fileID: 1670166388}
   - {fileID: 2913626579283294008}

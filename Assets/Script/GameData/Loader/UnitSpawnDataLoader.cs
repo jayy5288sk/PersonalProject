@@ -9,7 +9,7 @@ public class UnitSpawnDataLoader : MonoBehaviour
     [SerializeField] private string _unitSpawnTsvUrl;
 
     private const int INVALID_UNIT_ID = -1;
-    private const int EMPTY_UNIT = 0;
+    private const int EMPTY_UNIT = 0; // 유닛 없음. 유닛 ID로 사용하지 않음.
     
     public JArray UnitSpawnArray { get; private set; }
 
@@ -35,8 +35,14 @@ public class UnitSpawnDataLoader : MonoBehaviour
             
             // 변환 결과 변수 적용
             JArray convertJArray = ConvertTsvToJArray(unityWebRequest.downloadHandler.text);
+
+            // 스폰 데이터가 없을 때 에러 로그는 `ConvertTsvToJArray(string tsvContext)`쪽에서 출력
+            if (convertJArray.Count < 1)
+            {
+                yield break;
+            }
             
-            // 최종적으로 보여줄 스폰 포인트에 적용
+            // 최종적으로 보여줄 스폰 디자인에 적용
             UnitSpawnArray = convertJArray;
             Debug.Log($"({UnitSpawnArray.Count}x{((JArray)UnitSpawnArray[0]).Count}) 크기의 스폰 디자인 데이터 적용 성공");
         }
@@ -61,7 +67,7 @@ public class UnitSpawnDataLoader : MonoBehaviour
         }
 
         // 줄 당 칸 수 기준
-        int standardColumnCount = ParseRow(lines[0], 1).Count;
+        int standardColumnCount = 0;
         
         for (int i = 0; i < lines.Length; i++)
         {
@@ -70,6 +76,11 @@ public class UnitSpawnDataLoader : MonoBehaviour
             
             // 현재 줄에 있는 칸 수
             int columnCount = rowArray.Count;
+
+            if (i == 0)
+            {
+                standardColumnCount = columnCount;
+            }
             
             if (columnCount != standardColumnCount)
             {

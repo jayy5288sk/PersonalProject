@@ -7,9 +7,12 @@ public class HeadDataLoader : MonoBehaviour
     [SerializeField] private UnitDataLoader _unitDataLoader;
     [SerializeField] private WeaponDataLoader _weaponDataLoader;
     [SerializeField] private TerrainDataLoader _terrainDataLoader;
+    
     [SerializeField] private MapDesignDataLoader _mapDesignDataLoader;
     [SerializeField] private MapGenerator _mapGenerator;
+    
     [SerializeField] private UnitSpawnDataLoader _unitSpawnDataLoader;
+    [SerializeField] private UnitGenerator _unitGenerator;
     
     private void Awake() => LoadData();
 
@@ -33,5 +36,7 @@ public class HeadDataLoader : MonoBehaviour
         yield return unitSpawnRoutine;
         
         _mapGenerator.GenerateMap(_mapDesignDataLoader.MapArray);
+        _unitGenerator.PlacementUnit(_unitSpawnDataLoader.UnitSpawnArray, 
+                                     _mapDesignDataLoader.MapArray.Count);
     }
 }

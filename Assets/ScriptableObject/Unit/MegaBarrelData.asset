@@ -19,3 +19,5 @@ MonoBehaviour:
   _movementPoints: 0
   _basicWeapon: 
   _expandedWeapon: 
+  _teamSide: 
+  _unitPrefab: {fileID: 1653135108486208113, guid: 82feb3440d873464d8484f6e395476fa, type: 3}

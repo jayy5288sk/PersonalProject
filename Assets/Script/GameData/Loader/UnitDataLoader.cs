@@ -9,8 +9,8 @@ public class UnitDataLoader : MonoBehaviour
 {
     [SerializeField] private string _unitTsvUrl;
 
-    // 데이터 열의 개수(id, 유닛 이름, HP, EN, 행동력, 기본 무장, 확장 무장)
-    private const int COLUMN_COUNT = 7;
+    // 데이터 열의 개수(id, 유닛 이름, HP, EN, 행동력, 기본 무장, 확장 무장, 진영)
+    private const int COLUMN_COUNT = 8;
     
     [SerializeField] private List<UnitData> _units = new();
     private Dictionary<int, UnitData> _unitDataById = new();
@@ -134,7 +134,8 @@ public class UnitDataLoader : MonoBehaviour
             ["en"] = en,
             ["movePoints"] = movePoints,
             ["basicWeapon"] = values[5],
-            ["expandedWeapon"] = values[6]
+            ["expandedWeapon"] = values[6],
+            ["teamSide"] = values[7]
         };
     }
 
@@ -158,13 +159,30 @@ public class UnitDataLoader : MonoBehaviour
                     jsonObject.Value<int>("en"),
                     jsonObject.Value<int>("movePoints"),
                     jsonObject.Value<string>("basicWeapon"),
-                    jsonObject.Value<string>("expandedWeapon")
+                    jsonObject.Value<string>("expandedWeapon"),
+                    jsonObject.Value<string>("teamSide")
                 );
             }
             else
             {
                 Debug.Log("UnitData 값을 가져오지 못했다");
             }
+        }
+    }
+    
+    /// <summary>
+    /// 유닛 로더에 해당 ID의 SO를 가져오기 위한 함수
+    /// </summary>
+    public bool TryGetUnitData(int id, out UnitData unitData)
+    {
+        if (_unitDataById.TryGetValue(id, out unitData))
+        {
+            return true;
+        }
+        else
+        {
+            Debug.Log($"ID {id}번의 유닛 데이터를 갖고 오지 못했다");
+            return false;
         }
     }
 }

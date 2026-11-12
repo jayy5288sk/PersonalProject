@@ -1,0 +1,250 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &810297248849482382
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 145900388006395448}
+  - component: {fileID: 4791265343919978130}
+  m_Layer: 0
+  m_Name: MapDesignDataLoader
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &145900388006395448
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 810297248849482382}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2741112408897058872}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4791265343919978130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 810297248849482382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e85d186fd8d4d8a4a9492c865be4b7f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MapDesignDataLoader
+--- !u!1 &824075397592344024
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4748847791688905001}
+  - component: {fileID: 160789832547833786}
+  m_Layer: 0
+  m_Name: UnitDataLoader
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4748847791688905001
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 824075397592344024}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2741112408897058872}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &160789832547833786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 824075397592344024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 257f118b508b39a4286675ca5425bc7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitDataLoader
+  _unitTsvUrl: https://docs.google.com/spreadsheets/d/1IdpHrRG9OCjbC6euPdm8ktoVfJ6e3ZHGoZg01Jqd9Gc/export?format=tsv&gid=0
+  _units:
+  - {fileID: 11400000, guid: 19b5f96b38a538047b6c6687abe8a8b0, type: 2}
+  - {fileID: 11400000, guid: 3b5c99ad94bce3a48bc36b54a12ff699, type: 2}
+  - {fileID: 11400000, guid: b3571afe1364f344284ece7d3a8fcb98, type: 2}
+--- !u!1 &2784214036801862280
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5347391989595287910}
+  - component: {fileID: 8403373362854386925}
+  m_Layer: 0
+  m_Name: TerrainDataLoader
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5347391989595287910
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2784214036801862280}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2741112408897058872}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8403373362854386925
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2784214036801862280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 341aa16f67bca6544b56f507a0621e6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TerrainDataLoader
+  _terrainTsvUrl: https://docs.google.com/spreadsheets/d/1IdpHrRG9OCjbC6euPdm8ktoVfJ6e3ZHGoZg01Jqd9Gc/export?format=tsv&gid=24083833
+  _terrains:
+  - {fileID: 11400000, guid: b324132849c469a45917bd13e57c96fc, type: 2}
+  - {fileID: 11400000, guid: 7f46b8597a6b03544820d80a95b13f7f, type: 2}
+  - {fileID: 11400000, guid: f5a7b8350c352be4e8234bc726671faa, type: 2}
+  - {fileID: 11400000, guid: 16d04ee7727673240b4eb07ab4d3f712, type: 2}
+--- !u!1 &5711086314814759110
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9163733423888001383}
+  - component: {fileID: 1937212587853195743}
+  m_Layer: 0
+  m_Name: WeaponDataLoader
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9163733423888001383
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5711086314814759110}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2741112408897058872}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1937212587853195743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5711086314814759110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f202697d7bc4a8444adc0d6f084a012a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDataLoader
+  _weaponTsvUrl: https://docs.google.com/spreadsheets/d/1IdpHrRG9OCjbC6euPdm8ktoVfJ6e3ZHGoZg01Jqd9Gc/export?format=tsv&gid=1925589654
+  _weapons:
+  - {fileID: 11400000, guid: ff715cb410589b846a1d636da3a69d2e, type: 2}
+  - {fileID: 11400000, guid: 1a153d4a362a17745a05863fcbbe33f1, type: 2}
+  - {fileID: 11400000, guid: 1de48036151e27242969d7a6f8326a7f, type: 2}
+  - {fileID: 11400000, guid: 9fc5b05ea8fab1343a54409c9d345f38, type: 2}
+  - {fileID: 11400000, guid: ffd7d8d1a52c5c34998a13a54248c057, type: 2}
+  - {fileID: 11400000, guid: 1e71e0c27bfa0ce4ba63ef36c29f4a87, type: 2}
+--- !u!1 &6164395018762588791
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2741112408897058872}
+  - component: {fileID: 5379219458991155985}
+  m_Layer: 0
+  m_Name: DataLoader
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2741112408897058872
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6164395018762588791}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4748847791688905001}
+  - {fileID: 9163733423888001383}
+  - {fileID: 5347391989595287910}
+  - {fileID: 145900388006395448}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5379219458991155985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6164395018762588791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2266b97eaac10340a9d85735485d77f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HeadDataLoader
+  _unitDataLoader: {fileID: 160789832547833786}
+  _weaponDataLoader: {fileID: 1937212587853195743}
+  _terrainDataLoader: {fileID: 8403373362854386925}
+  _mapDesignDataLoader: {fileID: 4791265343919978130}
+  _mapGenerator: {fileID: 2649369796044933556, guid: e6a38f201936fb64087a0ea817535e6d, type: 3}

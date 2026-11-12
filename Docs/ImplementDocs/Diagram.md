@@ -7,7 +7,7 @@
 
 ```mermaid
 flowchart TB
-    Head["<b>HeadDataLoader</b><br/>LoadExternalDataRoutine()<br/>네 로더 동시 실행 후 완료 대기"]
+    Head["<b>HeadDataLoader</b><br/>LoadExternalDataRoutine()<br/>다섯 로더 동시 실행 후 완료 대기"]
 
     subgraph Unit["유닛"]
         direction TB
@@ -45,13 +45,25 @@ flowchart TB
         MapLoader -->|변환 후 보관| MapArray
     end
 
+    subgraph Spawn["스폰 디자인"]
+        direction TB
+        SpawnSheet[("스테이지 스폰 TSV 시트")]
+        SpawnLoader["<b>UnitSpawnDataLoader</b><br/>LoadUnitSpawnTable()"]
+        SpawnArray["<b>UnitSpawnArray (JArray)</b><br/>[행][열] = 유닛 ID"]
+        SpawnSheet -->|다운로드| SpawnLoader
+        SpawnLoader -->|변환 후 보관| SpawnArray
+    end
+
     Generator["<b>MapGenerator</b><br/>GenerateMap()"]
+    UnitGen["<b>UnitGenerator</b><br/>PlacementUnit()"]
 
     Head -->|코루틴 실행| UnitLoader
     Head -->|코루틴 실행| WeaponLoader
     Head -->|코루틴 실행| TerrainLoader
     Head -->|코루틴 실행| MapLoader
-    Head -->|모든 로드 완료 후 MapArray 전달| Generator
+    Head -->|코루틴 실행| SpawnLoader
+    Head -->|1. 모든 로드 완료 후 MapArray 전달| Generator
+    Head -->|2. 맵 생성 다음, UnitSpawnArray·맵 행 수 전달| UnitGen
 ```
 
 ### 로더 내부 처리 순서 (유닛·무기 공통)
@@ -85,6 +97,24 @@ flowchart LR
     SO --> Spawn
     Def --> Spawn
     Def -.-> Block
+```
+
+## 유닛 생성 (F-03)
+
+```mermaid
+flowchart LR
+    Gen["<b>UnitGenerator</b><br/>PlacementUnit()<br/>스폰 데이터 null이면 종료<br/>행 → 열 2중 반복"]
+    Unit["<b>UnitDataLoader</b><br/>TryGetUnitData(ID)"]
+    SO["<b>UnitData (SO)</b><br/>UnitPrefab"]
+    Skip["그 칸 건너뜀"]
+    Err["에러 로그 후<br/>그 칸 건너뜀"]
+    Spawn["<b>Instantiate</b><br/>위치 계산 (TechSpec.md 참고, 행 수 = 맵 행 수)<br/>UnitGenerator의 자식으로 생성"]
+
+    Gen -->|칸의 유닛 ID| Unit
+    Unit -->|찾음| SO
+    Unit -->|못 찾음| Skip
+    SO -->|프리팹 있음| Spawn
+    SO -->|프리팹 없음| Err
 ```
 
 ## 유닛·무기 연결 (미구현, P1 11/14)

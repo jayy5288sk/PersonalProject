@@ -69,7 +69,7 @@ public class TileSelector : MonoBehaviour
             return;
         }
 
-        Debug.Log($"클릭한 곳: 행 {_currentSection.y}, 열 {_currentSection.x}");
+        Debug.Log($"클릭한 곳: 행 {_currentSection.y + 1}, 열 {_currentSection.x + 1}");
     }
 
     // 마우스가 가리키는 칸을 계산하고, 칸이 바뀌었을 때만 하이라이트를 갱신

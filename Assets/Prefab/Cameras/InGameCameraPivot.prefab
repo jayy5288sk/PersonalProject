@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CameraView
   _mapGenerator: {fileID: 0}
   _cameraMove: {fileID: -6805970591091260150, guid: 8b23bff190deabe42a805970bfeab07f, type: 3}
-  _cameraMoveSpeed: 3
+  _cameraMoveSpeed: 5
 --- !u!1 &8278524054688509955
 GameObject:
   m_ObjectHideFlags: 0

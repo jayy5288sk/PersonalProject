@@ -412,6 +412,10 @@ PrefabInstance:
       propertyPath: _mapGenerator
       value: 
       objectReference: {fileID: 482074013}
+    - target: {fileID: 4677258212894510684, guid: 3219644314e0aa446b6f04afc688e3e6, type: 3}
+      propertyPath: _cameraMoveSpeed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 6559901940233164415, guid: 3219644314e0aa446b6f04afc688e3e6, type: 3}
       propertyPath: m_Name
       value: InGameCameraPivot

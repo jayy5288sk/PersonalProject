@@ -2,15 +2,15 @@ using UnityEngine;
 
 public class MapUnit : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [SerializeField] private UnitData _selectUnitData;
+    [SerializeField] private Vector2Int _sectionUnitPos;
+    
+    public UnitData SelectUnitData => _selectUnitData;
+    public Vector2Int SectionUnitPos => _sectionUnitPos;
 
-    // Update is called once per frame
-    void Update()
+    public void SetUnitData(UnitData unitData, Vector2Int sectionUnitPos)
     {
-        
+        _selectUnitData = unitData;
+        _sectionUnitPos = sectionUnitPos;
     }
 }

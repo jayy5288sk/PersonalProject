@@ -25,6 +25,7 @@ public class UnitGenerator : MonoBehaviour
             {
                 int currentID = spawnArray[i][j].Value<int>(); // 배치될 유닛의 ID
                 GameObject currentUnit; // 배치될 유닛
+                GameObject mapSpawnUnit; // 정보를 받을 유닛
                 
                 if (_unitDataLoader.TryGetUnitData(currentID, out UnitData unitData))
                 {
@@ -46,7 +47,8 @@ public class UnitGenerator : MonoBehaviour
                     continue;
                 }
                 
-                Instantiate(currentUnit, position, Quaternion.identity, transform);
+                mapSpawnUnit = Instantiate(currentUnit, position, Quaternion.identity, transform);
+                mapSpawnUnit.AddComponent<MapUnit>();
             }
         }
     }

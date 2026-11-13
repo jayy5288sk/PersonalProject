@@ -131,3 +131,54 @@ flowchart LR
     WeaponLoader -.->|2. WeaponData 반환| Linker
     Linker -.->|3. WeaponData 참조 설정| UnitSO
 ```
+
+## 맵 입력·카메라 준비 (F-02, F-03)
+
+```mermaid
+flowchart LR
+    Head["<b>HeadDataLoader</b><br/>모든 로드 완료"]
+    Gen["<b>MapGenerator</b><br/>GenerateMap()<br/>RowCount·ColumnCount 기록"]
+    Evt(["OnMapGenerateCompleted"])
+    Sel["<b>TileSelector</b><br/>HandleMapGenerated()<br/>타일 윗면 높이에 바닥 평면 생성"]
+    Cam["<b>CameraView</b><br/>HandleMapGenerated()<br/>이동 범위 (0,0) ~ ((열-1)×칸, (행-1)×칸)"]
+
+    Head -->|MapArray 전달| Gen
+    Gen -->|타일 설치 후 발생| Evt
+    Evt -->|구독| Sel
+    Evt -->|구독| Cam
+```
+
+### 칸 강조 처리 순서 (TileSelector, 매 프레임)
+
+```mermaid
+flowchart LR
+    A["TileOverlap<br/>마우스 화면 좌표"] --> B["ScreenPointToRay()<br/>바닥 평면과 교차"]
+    B -->|교차 없음| H["ClearPointedSection()<br/>맵 밖이 된 순간만 숨김"]
+    B -->|교차점| C["WorldToSection()<br/>(열, 행) 반올림 변환<br/>TechSpec.md 참고"]
+    C --> D{"IsInsideMap()"}
+    D -->|밖| H
+    D -->|안| E{"이전 칸과 같음?"}
+    E -->|같음| F["갱신 없음"]
+    E -->|다름| G["현재 칸 저장<br/>하이라이트 이동·표시"]
+```
+
+### 클릭 처리 (TileSelector)
+
+```mermaid
+flowchart LR
+    Click["TileClick<br/>마우스 좌클릭"] --> Check{"맵 안을<br/>가리키는 중?"}
+    Check -->|아니오| End["무시"]
+    Check -->|예| Use["저장된 현재 칸<br/>(행, 열) 로그"]
+    Use -.->|미구현, F-04| Unit["유닛 선택"]
+```
+
+### 카메라 이동 (CameraView, 매 프레임)
+
+```mermaid
+flowchart LR
+    Input["CameraMove<br/>WASD 2D Vector"] --> Dir["Pivot right·forward로<br/>월드 방향 변환"]
+    Dir --> Move["속도 × deltaTime 만큼 이동"]
+    Move --> Clamp["X·Z를 이동 범위로 제한"]
+    Clamp --> Pivot["<b>InGameCameraPivot</b><br/>위치 적용<br/>(자식 카메라 60° 기울기)"]
+    Edge["화면 가장자리 이동<br/>(미구현, P2)"] -.-> Dir
+```

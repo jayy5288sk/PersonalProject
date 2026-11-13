@@ -121,7 +121,10 @@ public class TileSelector : MonoBehaviour
     private Vector2Int WorldToSection(Vector3 worldPosition)
     {
         int column = Mathf.RoundToInt(worldPosition.x / MapGenerator.TERRAIN_SIZE);
-        int row = _mapGenerator.RowCount - 1 - Mathf.RoundToInt(worldPosition.z / MapGenerator.TERRAIN_SIZE);
+        int row = _mapGenerator.RowCount - 1 - Mathf.RoundToInt
+                  (
+                      worldPosition.z / MapGenerator.TERRAIN_SIZE
+                  );
 
         return new Vector2Int(column, row);
     }

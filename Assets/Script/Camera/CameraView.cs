@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,9 +11,21 @@ public class CameraView : MonoBehaviour
     private Vector2 _minCameraPos;
     private Vector2 _maxCameraPos;
     private bool _isMapGenerated;
+    
+    private float _screenMoveSpeed => _cameraMoveSpeed * Time.deltaTime;
 
     private void OnEnable() => BindEvents();
     private void OnDisable() => UnbindEvents();
+
+    private void Update()
+    {
+        if (!_isMapGenerated)
+        {
+            return;
+        }
+        
+        CameraMove();
+    }
 
     private void BindEvents()
     {
@@ -36,7 +49,26 @@ public class CameraView : MonoBehaviour
         _minCameraPos = new Vector2(0, 0);
         _maxCameraPos = new Vector2(x, z);
         
-        Debug.Log($"{_maxCameraPos.x}, {_maxCameraPos.y}");
         _isMapGenerated = true;
+    }
+
+    private void CameraMove()
+    {
+        Vector2 cameraPosMove = _cameraMove.action.ReadValue<Vector2>();
+
+        // Pivot 기준으로 입력을 월드 방향으로 변환
+        Vector3 moveDirection = (transform.right * cameraPosMove.x) + 
+                                (transform.forward * cameraPosMove.y);
+
+        Vector3 currentPosition = transform.position;
+
+        // 이동
+        currentPosition += moveDirection * _screenMoveSpeed;
+
+        // 제한
+        currentPosition.x = Mathf.Clamp(currentPosition.x, _minCameraPos.x, _maxCameraPos.x);
+        currentPosition.z = Mathf.Clamp(currentPosition.z, _minCameraPos.y, _maxCameraPos.y);
+
+        transform.position = currentPosition;
     }
 }

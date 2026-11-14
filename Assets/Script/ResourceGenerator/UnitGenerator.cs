@@ -10,6 +10,7 @@ public class UnitGenerator : MonoBehaviour
     [SerializeField] private UnitDataLoader _unitDataLoader;
 
     private Dictionary<Vector2Int, MapUnit> _unitsBySection = new();
+    public IReadOnlyDictionary<Vector2Int, MapUnit> UnitsBySection => _unitsBySection;
     private int _mapRowCount;
     
     public void PlacementUnit(JArray spawnArray, int unitSpawnArrayRow)

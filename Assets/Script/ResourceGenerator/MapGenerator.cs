@@ -8,8 +8,8 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] private TerrainDataLoader _terrainDataLoader;
     [SerializeField] private GameObject _defaultTilePrefab; // 디폴트 용도 지형
 
-    private Dictionary<Vector2Int, TerrainData> _mapBySection = new();
-    public IReadOnlyDictionary<Vector2Int, TerrainData> MapBySection => _mapBySection;
+    private Dictionary<Vector2Int, TerrainData> _terrainBySection = new();
+    public IReadOnlyDictionary<Vector2Int, TerrainData> TerrainBySection => _terrainBySection;
 
     public const float TERRAIN_SIZE = 1f;
     public int RowCount { get; private set; }
@@ -32,7 +32,7 @@ public class MapGenerator : MonoBehaviour
                 
                 if (_terrainDataLoader.TryGetTerrainData(currentID, out TerrainData terrainData))
                 {
-                    _mapBySection.Add(currentSection, terrainData);
+                    _terrainBySection.Add(currentSection, terrainData);
                     currentTerrain = terrainData.TilePrefab;
                 }
                 else

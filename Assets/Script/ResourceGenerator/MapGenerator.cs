@@ -1,11 +1,15 @@
 using System;
 using UnityEngine;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 public class MapGenerator : MonoBehaviour
 {
     [SerializeField] private TerrainDataLoader _terrainDataLoader;
     [SerializeField] private GameObject _defaultTilePrefab; // 디폴트 용도 지형
+
+    private Dictionary<Vector2Int, TerrainData> _mapBySection = new();
+    public IReadOnlyDictionary<Vector2Int, TerrainData> MapBySection => _mapBySection;
 
     public const float TERRAIN_SIZE = 1f;
     public int RowCount { get; private set; }
@@ -24,9 +28,11 @@ public class MapGenerator : MonoBehaviour
             {
                 int currentID = mapArray[i][j].Value<int>(); // 만들어질 지형의 ID
                 GameObject currentTerrain; // 만들어질 지형
+                Vector2Int currentSection = new Vector2Int(j, i); // 만들어질 지형 위치
                 
                 if (_terrainDataLoader.TryGetTerrainData(currentID, out TerrainData terrainData))
                 {
+                    _mapBySection.Add(currentSection, terrainData);
                     currentTerrain = terrainData.TilePrefab;
                 }
                 else
@@ -35,7 +41,8 @@ public class MapGenerator : MonoBehaviour
                 }
                 
                 // 지형 설치 위치
-                Vector3 position = new Vector3(j * TERRAIN_SIZE, 0.5f, (RowCount - 1 - i) * TERRAIN_SIZE);
+                Vector3 position = new Vector3(currentSection.x * TERRAIN_SIZE, 0.5f, 
+                                              (RowCount - 1 - currentSection.y) * TERRAIN_SIZE);
                 
                 // 위치에 설치
                 Instantiate(currentTerrain, position, Quaternion.identity, transform);

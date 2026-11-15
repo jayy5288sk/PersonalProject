@@ -24,6 +24,22 @@ public class MovementRangeCalculator
         
         reachableSections[startSection] = 0;
         neighbours.Add(startSection);
+
+        while (neighbours.Count > 0)
+        {
+            int cheapestIndex = 0;
+
+            for (int i = 1; i < neighbours.Count; i++)
+            {
+                if (reachableSections[neighbours[i]] < reachableSections[neighbours[cheapestIndex]])
+                {
+                    cheapestIndex = i;
+                }
+            }
+            
+            Vector2Int currentSection = neighbours[cheapestIndex];
+            neighbours.RemoveAt(cheapestIndex);
+        }
         
         return reachableSections;
     }

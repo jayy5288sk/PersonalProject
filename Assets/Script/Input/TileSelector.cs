@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,6 +6,7 @@ public class TileSelector : MonoBehaviour
 {
     [SerializeField] private MapGenerator _mapGenerator;
     [SerializeField] private UnitGenerator _unitGenerator;
+    [SerializeField] private MoveRangeDisplay _moveRangeDisplay;
     [SerializeField] private InputActionReference _terrainOverlap;
     [SerializeField] private InputActionReference _terrainClick;
     [SerializeField] private float _groundHeight = 0.75f; // 타일 윗면 높이
@@ -98,7 +99,7 @@ public class TileSelector : MonoBehaviour
 
         _currentSection = section;
         _isMapInside = true;
-        _groundHighlight.transform.position = SectionToHighlightPosition(section);
+        _groundHighlight.transform.position = SectionToHighlightWorldPosition(section);
         _groundHighlight.SetActive(true);
     }
 
@@ -139,7 +140,7 @@ public class TileSelector : MonoBehaviour
     }
 
     // (열, 행) → 하이라이트를 놓을 월드 좌표
-    private Vector3 SectionToHighlightPosition(Vector2Int section)
+    private Vector3 SectionToHighlightWorldPosition(Vector2Int section)
     {
         float x = section.x * MapGenerator.TERRAIN_SIZE;
         float y = _groundHeight + _highlightOffset;

@@ -77,8 +77,29 @@ public class TileSelector : MonoBehaviour
         }
 
         Debug.Log($"클릭한 곳: 행 {_currentSection.y + 1}, 열 {_currentSection.x + 1}");
-        
+
+        // 선택 상태: 선택 갈래만 실행하고 대기 갈래로 넘어가지 않음
+        if (_selectedUnit != null)
+        {
+            HandleSelectedStateClick(_currentSection);
+            return;
+        }
+
         TrySelectUnit(_currentSection);
+    }
+
+    // 선택 상태의 클릭 처리. 숫자 칸이면 이동, 그 외 칸이면 취소
+    private void HandleSelectedStateClick(Vector2Int section)
+    {
+        if (_destinationData.ContainsKey(section))
+        {
+            _unitGenerator.MoveUnitToSection(_selectedUnit, section);
+        }
+
+        // 이동, 취소 공통: 표시 끄기 → 대기 상태로 되돌리기
+        _moveRangeDisplay.ClearHighlights();
+        _selectedUnit = null;
+        _destinationData = null;
     }
 
     private void TrySelectUnit(Vector2Int section)

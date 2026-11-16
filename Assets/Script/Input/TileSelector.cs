@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 public class TileSelector : MonoBehaviour
 {
     [SerializeField] private MapGenerator _mapGenerator;
+    [SerializeField] private UnitGenerator _unitGenerator;
     [SerializeField] private InputActionReference _terrainOverlap;
     [SerializeField] private InputActionReference _terrainClick;
     [SerializeField] private float _groundHeight = 0.75f; // 타일 윗면 높이

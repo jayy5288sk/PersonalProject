@@ -667,6 +667,10 @@ PrefabInstance:
       propertyPath: _mapGenerator
       value: 
       objectReference: {fileID: 482074013}
+    - target: {fileID: 6713231128298097193, guid: 3e22ffa388f5ac846b901a025f5f99b4, type: 3}
+      propertyPath: _unitGenerator
+      value: 
+      objectReference: {fileID: 1670166387}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

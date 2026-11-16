@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 
 public class TileSelector : MonoBehaviour
 {
+    private const string ALLY_TEAMSIDE = "Ally";
+    
     [SerializeField] private MapGenerator _mapGenerator;
     [SerializeField] private UnitGenerator _unitGenerator;
     [SerializeField] private MoveRangeDisplay _moveRangeDisplay;
@@ -19,6 +21,9 @@ public class TileSelector : MonoBehaviour
     private Vector2Int _currentSection = new(-1, -1); // 맵 어느 구역인지(열, 행)
     private Plane _groundCheckPlane; // 마우스 Ray 계산용 바닥 평면
     private GameObject _groundHighlight; // 지정된 프리팹(_highlightPrefab) 복사본 용도
+    private MovementRangeCalculator _movementRangeCalculator;
+    private MapUnit _selectedUnit;
+    private Dictionary<Vector2Int, int> _destinationData;
 
     private void Awake() => Init();
 
@@ -72,6 +77,41 @@ public class TileSelector : MonoBehaviour
         }
 
         Debug.Log($"클릭한 곳: 행 {_currentSection.y + 1}, 열 {_currentSection.x + 1}");
+        
+        TrySelectUnit(_currentSection);
+    }
+
+    private void TrySelectUnit(Vector2Int section)
+    {
+        // 유닛 유무 및 아군 판별
+        bool isUnitExist = _unitGenerator.TryGetUnitAtSection(section, out MapUnit unit);
+        if (!isUnitExist || unit.SelectUnitData.TeamSide != ALLY_TEAMSIDE)
+        {
+            return;
+        }
+
+        // 필요값 주입 및 결과값 저장
+        _destinationData = _movementRangeCalculator.GetReachableSections
+        (
+            unit.SectionUnitPos,
+            unit.SelectUnitData.MovementPoints,
+            unit.SelectUnitData.TeamSide,
+            _mapGenerator.TerrainBySection,
+            _unitGenerator.UnitsBySection
+        );
+
+        // 변환 및 정보 목록 등록
+        List<(Vector3 position, int cost)> highLightList = new();
+        foreach (KeyValuePair<Vector2Int, int> pair in _destinationData)
+        {
+            Vector3 position = SectionToHighlightWorldPosition(pair.Key);
+            highLightList.Add((position, pair.Value));
+        }
+        
+        // 결과값 보여주기
+        _moveRangeDisplay.ShowMoveRangeHighlight(highLightList);
+        
+        _selectedUnit = unit;
     }
 
     // 마우스가 가리키는 칸을 계산하고, 칸이 바뀌었을 때만 하이라이트를 갱신
@@ -171,5 +211,7 @@ public class TileSelector : MonoBehaviour
                                        _highlightPrefab.transform.rotation);
 
         _groundHighlight.SetActive(false);
+        
+        _movementRangeCalculator = new MovementRangeCalculator();
     }
 }

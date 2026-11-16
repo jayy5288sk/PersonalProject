@@ -80,41 +80,47 @@ flowchart LR
     A["LoadMapTable()<br/>TSV 다운로드"] --> B["ConvertTsvToJArray()<br/>줄 단위 분리·1행 기준 칸 수 검사"] --> C["ParseRow()<br/>칸마다 숫자 변환<br/>실패 시 -1"] --> D["MapArray에 보관"]
 ```
 
-## 맵 생성 (F-03)
+## 맵 생성 (F-03, F-05)
 
 ```mermaid
 flowchart LR
-    Gen["<b>MapGenerator</b><br/>GenerateMap()<br/>행 → 열 2중 반복"]
+    Gen["<b>MapGenerator</b><br/>GenerateMap()<br/>행 → 열 2중 반복<br/>칸 좌표 = (열, 행)"]
     Terrain["<b>TerrainDataLoader</b><br/>TryGetTerrainData(ID)"]
     SO["<b>TerrainData (SO)</b><br/>TilePrefab"]
     Def["<b>Default.prefab</b>"]
     Spawn["<b>Instantiate</b><br/>위치 계산 (TechSpec.md 참고)<br/>MapGenerator의 자식으로 생성"]
-    Block["진입 불가 칸 기록<br/>(미구현, F-05)"]
+    Dict["<b>지형 사전</b><br/>TerrainBySection<br/>칸 → TerrainData"]
+    Block["사전에 등록 안 함<br/>= 진입 불가 (F-05)"]
 
     Gen -->|칸의 지형 ID| Terrain
     Terrain -->|찾음| SO
     Terrain -->|못 찾음| Def
     SO --> Spawn
+    SO -->|등록| Dict
     Def --> Spawn
-    Def -.-> Block
+    Def --> Block
 ```
 
-## 유닛 생성 (F-03)
+## 유닛 생성 (F-03, F-05)
 
 ```mermaid
 flowchart LR
-    Gen["<b>UnitGenerator</b><br/>PlacementUnit()<br/>스폰 데이터 null이면 종료<br/>행 → 열 2중 반복"]
+    Gen["<b>UnitGenerator</b><br/>PlacementUnit()<br/>스폰 데이터 null이면 종료<br/>맵 행 수 기억<br/>행 → 열 2중 반복"]
     Unit["<b>UnitDataLoader</b><br/>TryGetUnitData(ID)"]
     SO["<b>UnitData (SO)</b><br/>UnitPrefab"]
     Skip["그 칸 건너뜀"]
     Err["에러 로그 후<br/>그 칸 건너뜀"]
-    Spawn["<b>Instantiate</b><br/>위치 계산 (TechSpec.md 참고, 행 수 = 맵 행 수)<br/>UnitGenerator의 자식으로 생성"]
+    Spawn["<b>Instantiate</b><br/>SectionToUnitPosition()<br/>UnitGenerator의 자식으로 생성"]
+    MU["<b>MapUnit</b><br/>AddComponent 후<br/>SetUnitData(UnitData, 칸)"]
+    Dict["<b>유닛 사전</b><br/>UnitsBySection<br/>칸 → MapUnit"]
 
     Gen -->|칸의 유닛 ID| Unit
     Unit -->|찾음| SO
     Unit -->|못 찾음| Skip
     SO -->|프리팹 있음| Spawn
     SO -->|프리팹 없음| Err
+    Spawn --> MU
+    MU -->|등록| Dict
 ```
 
 ## 유닛·무기 연결 (미구현, P1 11/14)
@@ -162,14 +168,75 @@ flowchart LR
     E -->|다름| G["현재 칸 저장<br/>하이라이트 이동·표시"]
 ```
 
-### 클릭 처리 (TileSelector)
+### 클릭 처리 (TileSelector, F-05)
+
+```mermaid
+flowchart TB
+    Click["TileClick<br/>마우스 좌클릭"] --> Check{"맵 안을<br/>가리키는 중?"}
+    Check -->|아니오| End["무시<br/>(선택 상태여도 유지)"]
+    Check -->|예| Use["저장된 현재 칸<br/>(행, 열) 로그"]
+    Use --> State{"_selectedUnit<br/>비어 있음?"}
+
+    State -->|예: 대기| Try["<b>TrySelectUnit()</b><br/>TryGetUnitAtSection()"]
+    Try --> Ally{"아군 유닛?"}
+    Ally -->|아니오| End
+    Ally -->|예| Calc["<b>MovementRangeCalculator</b><br/>GetReachableSections()<br/>→ _destinationData"]
+    Calc --> Show["<b>MoveRangeDisplay</b><br/>ShowMoveRangeHighlight()<br/>(월드 위치, 비용) 목록"]
+    Show --> Sel["_selectedUnit = 유닛<br/>→ 선택 상태"]
+
+    State -->|아니오: 선택| Handle["<b>HandleSelectedStateClick()</b>"]
+    Handle --> Dest{"_destinationData에<br/>있는 칸?"}
+    Dest -->|예| Move["<b>UnitGenerator</b><br/>MoveUnitToSection()"]
+    Dest -->|아니오: 취소| Clear
+    Move --> Clear["ClearHighlights()<br/>_selectedUnit, _destinationData = null<br/>→ 대기 상태"]
+    Clear -.->|미구현, F-04| Switch["다른 아군 바로 선택<br/>상태 머신으로 이전"]
+```
+
+## 이동 범위 (F-05)
+
+### 이동 범위 계산 (MovementRangeCalculator, 다익스트라)
+
+```mermaid
+flowchart TB
+    In["입력: 출발 칸, 이동력, 진영<br/>지형 사전, 유닛 사전"] --> Init["결과 사전[출발 칸] = 0<br/>후보 목록에 출발 칸"]
+    Init --> Loop{"후보 목록<br/>남음?"}
+    Loop -->|예| Pick["누적 비용이 가장 싼 칸 꺼내기"]
+    Pick --> Dir["4방향 이웃 칸마다 검사"]
+    Dir --> A{"지형 사전에 없음<br/>또는 진입 불가 지형?"}
+    A -->|예| Skip["건너뜀"]
+    A -->|아니오| B{"다른 진영<br/>유닛 칸?"}
+    B -->|예| Skip
+    B -->|아니오| C{"현재 비용 + 들어갈 칸 RequireMove가<br/>이동력 초과?"}
+    C -->|예| Skip
+    C -->|아니오| D{"이미 같거나<br/>더 싼 비용 기록?"}
+    D -->|예| Skip
+    D -->|아니오| Rec["비용 기록<br/>후보에 없으면 추가"]
+    Rec --> Loop
+    Skip --> Loop
+    Loop -->|아니오| Fin["출발 칸, 같은 진영 유닛 칸 제거<br/>(지나갈 수는 있지만 멈출 수 없음)"]
+    Fin --> Out["결과: 칸 → 누적 비용"]
+```
+
+### 숫자 하이라이트 표시 (MoveRangeDisplay, 오브젝트 풀)
 
 ```mermaid
 flowchart LR
-    Click["TileClick<br/>마우스 좌클릭"] --> Check{"맵 안을<br/>가리키는 중?"}
-    Check -->|아니오| End["무시"]
-    Check -->|예| Use["저장된 현재 칸<br/>(행, 열) 로그"]
-    Use -.->|미구현, F-04| Unit["유닛 선택"]
+    Recv["ShowMoveRangeHighlight()<br/>(월드 위치, 비용) 목록"] --> Off["ClearHighlights()<br/>전부 끄기"]
+    Off --> Lack{"보유 개수가<br/>필요 개수보다 적음?"}
+    Lack -->|예| Dup["DuplicateHighlight()<br/>MoveRangeIndicator 복제 후 끄기"]
+    Dup --> Lack
+    Lack -->|아니오| On["<b>MoveRangeHighlight</b><br/>ShowMoveRange()<br/>위치 + 높이, 숫자 = 비용"]
+```
+
+### 유닛 이동 (UnitGenerator)
+
+```mermaid
+flowchart LR
+    Call["MoveUnitToSection()<br/>(MapUnit, 새 칸)"] --> Rm["유닛 사전에서<br/>옛 칸 Remove"]
+    Rm --> Add["새 칸에 Add"]
+    Add --> Set["MapUnit.SetUnitData()<br/>기존 UnitData + 새 칸"]
+    Set --> Pos["transform.position<br/>= SectionToUnitPosition()"]
+    Pos -.->|미구현, P2| Walk["한 칸씩 이동 연출"]
 ```
 
 ### 카메라 이동 (CameraView, 매 프레임)

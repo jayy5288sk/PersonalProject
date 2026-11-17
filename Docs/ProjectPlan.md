@@ -196,3 +196,7 @@
 - [Force Field - Sci-Fi Collection](https://assetstore.unity.com/packages/audio/sound-fx/force-field-sci-fi-collection-113256)
 - [Free Frost Mage SFX](https://assetstore.unity.com/packages/audio/sound-fx/free-frost-mage-sfx-249380)
 - [Free Laser Weapons](https://assetstore.unity.com/packages/audio/sound-fx/weapons/free-laser-weapons-214929)
+
+# 5. 발표 
+- 프로젝트에서 코어한 기능을 위주로 진행.
+- 5분 이내로의 용량.

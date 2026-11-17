@@ -101,7 +101,7 @@ flowchart LR
     Def --> Block
 ```
 
-## 유닛 생성 (F-03, F-05)
+## 유닛 생성 (F-03, F-04, F-05)
 
 ```mermaid
 flowchart LR
@@ -111,8 +111,10 @@ flowchart LR
     Skip["그 칸 건너뜀"]
     Err["에러 로그 후<br/>그 칸 건너뜀"]
     Spawn["<b>Instantiate</b><br/>SectionToUnitPosition()<br/>UnitGenerator의 자식으로 생성"]
-    MU["<b>MapUnit</b><br/>AddComponent 후<br/>SetUnitData(UnitData, 칸)"]
+    MU["<b>MapUnit</b><br/>AddComponent 즉시 Awake:<br/>Renderer·원래 색 저장<br/>SetUnitData(UnitData, 칸)"]
     Dict["<b>유닛 사전</b><br/>UnitsBySection<br/>칸 → MapUnit"]
+    Done(["OnUnitPlacementCompleted"])
+    Phase["<b>PhaseManager</b><br/>첫 아군 페이즈 시작 (F-04)"]
 
     Gen -->|칸의 유닛 ID| Unit
     Unit -->|찾음| SO
@@ -121,6 +123,8 @@ flowchart LR
     SO -->|프리팹 없음| Err
     Spawn --> MU
     MU -->|등록| Dict
+    Gen -->|모든 칸 반복 후 발생| Done
+    Done -->|구독| Phase
 ```
 
 ## 유닛·무기 연결 (미구현, P1 11/14)
@@ -145,7 +149,7 @@ flowchart LR
     Head["<b>HeadDataLoader</b><br/>모든 로드 완료"]
     Gen["<b>MapGenerator</b><br/>GenerateMap()<br/>RowCount·ColumnCount 기록"]
     Evt(["OnMapGenerateCompleted"])
-    Sel["<b>TileSelector</b><br/>HandleMapGenerated()<br/>타일 윗면 높이에 바닥 평면 생성"]
+    Sel["<b>TileSelector</b><br/>HandleMapGenerated()<br/>MapGenerator.GroundHeight 높이에 바닥 평면 생성"]
     Cam["<b>CameraView</b><br/>HandleMapGenerated()<br/>이동 범위 (0,0) ~ ((열-1)×칸, (행-1)×칸)"]
 
     Head -->|MapArray 전달| Gen
@@ -160,36 +164,144 @@ flowchart LR
 flowchart LR
     A["TileOverlap<br/>마우스 화면 좌표"] --> B["ScreenPointToRay()<br/>바닥 평면과 교차"]
     B -->|교차 없음| H["ClearPointedSection()<br/>맵 밖이 된 순간만 숨김"]
-    B -->|교차점| C["WorldToSection()<br/>(열, 행) 반올림 변환<br/>TechSpec.md 참고"]
-    C --> D{"IsInsideMap()"}
+    B -->|교차점| C["<b>MapGenerator</b><br/>WorldToSection()<br/>(열, 행) 반올림 변환<br/>TechSpec.md 참고"]
+    C --> D{"<b>MapGenerator</b><br/>IsInsideMap()"}
     D -->|밖| H
     D -->|안| E{"이전 칸과 같음?"}
     E -->|같음| F["갱신 없음"]
-    E -->|다름| G["현재 칸 저장<br/>하이라이트 이동·표시"]
+    E -->|다름| G["현재 칸 저장<br/>ReturnTerrainPosition() + 띄우는 높이<br/>하이라이트 이동·표시"]
 ```
 
-### 클릭 처리 (TileSelector, F-05)
+### 클릭 처리 (TileSelector, F-04)
+
+```mermaid
+flowchart LR
+    Frame["Update()<br/>UI 위 여부를 미리 계산<br/>(_isPointerOverUI)"] -.-> UI
+    Click["TileClick<br/>마우스 좌클릭"] --> In{"맵 안을<br/>가리키는 중?"}
+    In -->|아니오| End["무시"]
+    In -->|예| UI{"마우스가<br/>UI 위?"}
+    UI -->|예| End
+    UI -->|아니오| SM["<b>StateManager</b><br/>SectionClicked(현재 칸)<br/>→ 아군 페이즈 조작 참고"]
+```
+
+## 아군 페이즈 조작 (F-04)
+
+### 구조: 페이즈(바깥) + 조작 단계(안쪽)
 
 ```mermaid
 flowchart TB
-    Click["TileClick<br/>마우스 좌클릭"] --> Check{"맵 안을<br/>가리키는 중?"}
-    Check -->|아니오| End["무시<br/>(선택 상태여도 유지)"]
-    Check -->|예| Use["저장된 현재 칸<br/>(행, 열) 로그"]
-    Use --> State{"_selectedUnit<br/>비어 있음?"}
+    subgraph Input["입력"]
+        direction LR
+        Tile["<b>TileSelector</b><br/>칸 클릭"]
+        HUD["<b>CommandMenuHUD</b><br/>이동·공격·대기 버튼<br/>턴 종료 버튼"]
+    end
 
-    State -->|예: 대기| Try["<b>TrySelectUnit()</b><br/>TryGetUnitAtSection()"]
-    Try --> Ally{"아군 유닛?"}
-    Ally -->|아니오| End
-    Ally -->|예| Calc["<b>MovementRangeCalculator</b><br/>GetReachableSections()<br/>→ _destinationData"]
-    Calc --> Show["<b>MoveRangeDisplay</b><br/>ShowMoveRangeHighlight()<br/>(월드 위치, 비용) 목록"]
-    Show --> Sel["_selectedUnit = 유닛<br/>→ 선택 상태"]
+    Phase["<b>PhaseManager</b><br/>현재 페이즈 1개<br/>ChangePhase() · RequestTurnEnd()"]
+    SM["<b>StateManager</b><br/>현재 상태 1개 · StateContext 1개<br/>ChangeNextState() · 입력 잠금"]
+    Ctx["<b>StateContext</b><br/>SelectedUnit · IsUnitMoved"]
 
-    State -->|아니오: 선택| Handle["<b>HandleSelectedStateClick()</b>"]
-    Handle --> Dest{"_destinationData에<br/>있는 칸?"}
-    Dest -->|예| Move["<b>UnitGenerator</b><br/>MoveUnitToSection()"]
-    Dest -->|아니오: 취소| Clear
-    Move --> Clear["ClearHighlights()<br/>_selectedUnit, _destinationData = null<br/>→ 대기 상태"]
-    Clear -.->|미구현, F-04| Switch["다른 아군 바로 선택<br/>상태 머신으로 이전"]
+    subgraph Show["표시"]
+        direction LR
+        Disp["<b>UnitSelectDisplay</b><br/>바닥 테두리 + 머리 위 마커"]
+        MU["<b>MapUnit</b><br/>행동 완료 · 어둡게"]
+        Range["<b>MoveRangeDisplay</b><br/>이동 범위 숫자"]
+    end
+
+    Tile -->|SectionClicked| SM
+    HUD -->|ButtonInputReceiver CommandType| SM
+    HUD -->|RequestTurnEnd| Phase
+    SM --- Ctx
+    SM -->|상태 들어가기·나가기| Show
+    Phase -->|ResetControlState · SetInputLock| SM
+    Phase -->|ResetUnitAction| MU
+    SM -.->|OnStateChanged StateType| HUD
+    SM -.->|OnStateChanged StateType| Phase
+    Phase -.->|OnPhaseChanged PhaseType| HUD
+```
+
+> 실선은 메서드 호출, 점선은 이벤트 구독이다. `TempLog`(디버그 전용)도 두 이벤트를 구독한다.
+
+### 조작 단계 상태 전환 (StateManager)
+
+```mermaid
+flowchart TB
+    Start(["Start()"]) --> Wait
+
+    Wait["<b>UnitSelectWait</b><br/>들어가기: 선택 표시 끄기 · 컨텍스트 비우기"]
+    Cmd["<b>CommandSelect</b><br/>들어가기: 현재 위치로 선택 표시 켜기"]
+    Move["<b>MoveSectionSelect</b><br/>들어가기: 이동 범위 계산·표시<br/>나가기: 표시 끄기"]
+    Atk["<b>AttackTargetSelect</b><br/>들어가기: 로그"]
+
+    Wait -->|"클릭: 행동 가능한 아군<br/>PutUnit"| Cmd
+    Cmd -->|"Move (이동 전만)"| Move
+    Cmd -->|Attack| Atk
+    Cmd -->|"Wait<br/>CompleteUnitAction"| Wait
+    Cmd -->|"맵 클릭 (이동 전)<br/>= 선택 취소"| Wait
+    Move -->|"숫자 칸: MoveUnitToSection<br/>AlreadyMovedUnit"| Cmd
+    Move -->|"그 외 칸: 취소"| Cmd
+    Atk -->|"아무 칸 클릭<br/>(임시 탈출 경로)"| Cmd
+    Atk -.->|"미구현, F-06"| Fire["무장 선택 · 공격 범위 · 공격"]
+    Reset(["ResetControlState()<br/>아군 페이즈 시작 시"]) --> Wait
+```
+
+> 이동 후 커맨드 선택에서는 맵 클릭을 무시하고, `Move`는 HUD(버튼 비활성)와 상태(`IsUnitMoved` 확인) 양쪽에서 막는다.
+
+### 상태 전환 처리 순서 (ChangeNextState)
+
+```mermaid
+flowchart LR
+    In["SectionClicked() /<br/>ButtonInputReceiver()"] --> Lock{"입력 잠금?"}
+    Lock -->|예| X["무시"]
+    Lock -->|아니오| Ask["현재 상태에 위임<br/>SectionClick() / PressButton()"]
+    Ask --> Null{"반환값<br/>null?"}
+    Null -->|예| X2["전환 없음"]
+    Null -->|아니오| Exit["현재 상태<br/>StateExit()"]
+    Exit --> Swap["현재 상태 교체"]
+    Swap --> Enter["새 상태<br/>StateEnter()"]
+    Enter --> Evt(["OnStateChanged<br/>(StateType)"])
+```
+
+### 페이즈 전환 (PhaseManager)
+
+```mermaid
+flowchart TB
+    Placed(["OnUnitPlacementCompleted"]) --> Ally
+    Ally["<b>AllyPhase</b><br/>들어가기: 모든 아군 ResetUnitAction<br/>StateManager.ResetControlState()<br/>→ null (머무름)"]
+    Enemy["<b>EnemyPhase</b><br/>들어가기: SetInputLock(true)<br/>→ AllyPhase 반환 (임시 즉시 복귀)<br/>나가기: SetInputLock(false)"]
+
+    Check{"UnitSelectStandBy 수신 시<br/>아군 전원 행동 완료?<br/>(아군 0명이면 아니오)"}
+    Ally --> Check
+    Check -->|예| Enemy
+    Turn(["턴 종료 버튼<br/>RequestTurnEnd()<br/>아군 페이즈일 때만"]) --> Enemy
+    Enemy -->|임시| Ally
+    Enemy -.->|미구현, F-08| AI["적 AI 행동 후 아군 페이즈"]
+```
+
+### 페이즈 전환 처리 순서 (ChangePhase)
+
+```mermaid
+flowchart LR
+    Req["ChangePhase(다음 페이즈)"] --> Loop{"다음 페이즈<br/>있음?"}
+    Loop -->|아니오| End["종료"]
+    Loop -->|예| Exit["현재 페이즈<br/>PhaseExit()"]
+    Exit --> Swap["현재 페이즈 교체"]
+    Swap --> Enter["다음 페이즈 = PhaseEnter()<br/>(머무르면 null)"]
+    Enter --> Evt(["OnPhaseChanged<br/>(PhaseType)"])
+    Evt --> Loop
+```
+
+> 들어가기 안에서 직접 전환하지 않고 다음 페이즈를 반환하므로, 이벤트가 항상 `Enemy` → `Ally` 순서로 나간다.
+
+### 커맨드 메뉴 HUD (CommandMenuHUD)
+
+```mermaid
+flowchart LR
+    S(["OnStateChanged"]) --> IsCmd{"CommandSelect?"}
+    IsCmd -->|아니오| Off["패널 끄기"]
+    IsCmd -->|예| On["패널 켜기<br/>이동 버튼 = !IsSelectedUnitMoved"]
+    P(["OnPhaseChanged"]) --> TE["턴 종료 버튼<br/>= 아군 페이즈일 때만 활성"]
+    Btn["버튼 onClick<br/>(AddListener)"] -->|CommandType| SM["<b>StateManager</b><br/>ButtonInputReceiver()"]
+    TBtn["턴 종료 onClick"] --> PM["<b>PhaseManager</b><br/>RequestTurnEnd()"]
 ```
 
 ## 이동 범위 (F-05)

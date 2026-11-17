@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -12,7 +13,9 @@ public class UnitGenerator : MonoBehaviour
     private Dictionary<Vector2Int, MapUnit> _unitsBySection = new();
     public IReadOnlyDictionary<Vector2Int, MapUnit> UnitsBySection => _unitsBySection;
     private int _mapRowCount;
-    
+
+    public event Action OnUnitPlacementCompleted;
+
     public void PlacementUnit(JArray spawnArray, int unitSpawnArrayRow)
     {
         // 스폰 데이터를 불러오지 못한 경우. 원인 로그는 UnitSpawnDataLoader 쪽에서 출력
@@ -59,6 +62,23 @@ public class UnitGenerator : MonoBehaviour
                 MapUnit tempUnit = mapSpawnUnit.AddComponent<MapUnit>();
                 tempUnit.SetUnitData(unitData, unitSpawnPos);
                 _unitsBySection.Add(unitSpawnPos, tempUnit);
+            }
+        }
+
+        OnUnitPlacementCompleted?.Invoke();
+    }
+
+    /// <summary>
+    /// 해당 진영의 유닛을 result에 채움. 호출하는 쪽의 리스트를 재사용
+    /// </summary>
+    public void GetUnitsByTeam(string teamSide, List<MapUnit> result)
+    {
+        result.Clear();
+        foreach (MapUnit unit in _unitsBySection.Values)
+        {
+            if (unit.SelectUnitData.TeamSide == teamSide)
+            {
+                result.Add(unit);
             }
         }
     }

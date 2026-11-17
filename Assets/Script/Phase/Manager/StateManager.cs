@@ -32,13 +32,13 @@ public class StateManager : MonoBehaviour
             return;
         }
 
-        StateBase currentState = _currentState.SectionClick(section);
-        if (currentState == null)
+        StateBase nextState = _currentState.SectionClick(section);
+        if (nextState == null)
         {
             return;
         }
-        
-        ChangeNextState(currentState);
+
+        ChangeNextState(nextState);
     }
 
     public void ButtonInputReceiver(CommandType command)
@@ -48,13 +48,13 @@ public class StateManager : MonoBehaviour
             return;
         }
 
-        StateBase currentState = _currentState.PressButton(command);
-        if (currentState == null)
+        StateBase nextState = _currentState.PressButton(command);
+        if (nextState == null)
         {
             return;
         }
 
-        ChangeNextState(currentState);
+        ChangeNextState(nextState);
     }
 
     /// <summary>

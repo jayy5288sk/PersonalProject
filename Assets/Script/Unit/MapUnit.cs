@@ -28,7 +28,7 @@ public class MapUnit : MonoBehaviour
         _renderer.material.color = new Color(_originalColor.r * ACTION_DONE_BRIGHTNESS,
                                              _originalColor.g * ACTION_DONE_BRIGHTNESS,
                                              _originalColor.b * ACTION_DONE_BRIGHTNESS,
-                                               _originalColor.a);
+                                             _originalColor.a);
     }
 
     public void ResetUnitAction()

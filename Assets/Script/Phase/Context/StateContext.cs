@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class StateContext
 {
     public MapUnit SelectedUnit { get; private set; }

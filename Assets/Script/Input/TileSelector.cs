@@ -11,7 +11,6 @@ public class TileSelector : MonoBehaviour
     [SerializeField] private MoveRangeDisplay _moveRangeDisplay;
     [SerializeField] private InputActionReference _terrainOverlap;
     [SerializeField] private InputActionReference _terrainClick;
-    [SerializeField] private float _groundHeight = 0.75f; // 타일 윗면 높이
     [SerializeField] private float _highlightOffset = 0.01f; // 바닥에서 하이라이트를 띄우는 거리
     [SerializeField] private GameObject _highlightPrefab;
 
@@ -63,7 +62,7 @@ public class TileSelector : MonoBehaviour
     private void HandleMapGenerated()
     {
         // 평면은 끝없이 넓으므로 x, z는 아무 값이어도 같은 평면
-        Vector3 groundPoint = new Vector3(0f, _groundHeight, 0f);
+        Vector3 groundPoint = new Vector3(0f, _mapGenerator.GroundHeight, 0f);
         _groundCheckPlane = new Plane(Vector3.up, groundPoint);
         _isMapGenerated = true;
     }
@@ -125,7 +124,8 @@ public class TileSelector : MonoBehaviour
         List<(Vector3 position, int cost)> highLightList = new();
         foreach (KeyValuePair<Vector2Int, int> pair in _destinationData)
         {
-            Vector3 position = SectionToHighlightWorldPosition(pair.Key);
+            Vector3 position = (_mapGenerator.ReturnTerrainPosition(pair.Key) +
+                               (Vector3.up * _highlightOffset));
             highLightList.Add((position, pair.Value));
         }
         
@@ -144,9 +144,9 @@ public class TileSelector : MonoBehaviour
             return;
         }
 
-        Vector2Int section = WorldToSection(groundPosition);
+        Vector2Int section = _mapGenerator.WorldToSection(groundPosition);
 
-        if (!IsInsideMap(section))
+        if (!_mapGenerator.IsInsideMap(section))
         {
             ClearPointedSection();
             return;
@@ -160,7 +160,8 @@ public class TileSelector : MonoBehaviour
 
         _currentSection = section;
         _isMapInside = true;
-        _groundHighlight.transform.position = SectionToHighlightWorldPosition(section);
+        _groundHighlight.transform.position = _mapGenerator.ReturnTerrainPosition(section) +
+                                              (Vector3.up * _highlightOffset);
         _groundHighlight.SetActive(true);
     }
 
@@ -178,36 +179,6 @@ public class TileSelector : MonoBehaviour
 
         groundPosition = Vector3.zero;
         return false;
-    }
-
-    // 월드 좌표 → (열, 행). 칸 중심이 정수 좌표이므로 반올림
-    private Vector2Int WorldToSection(Vector3 worldPosition)
-    {
-        int column = Mathf.RoundToInt(worldPosition.x / MapGenerator.TERRAIN_SIZE);
-        int row = _mapGenerator.RowCount - 1 - Mathf.RoundToInt
-                  (
-                      worldPosition.z / MapGenerator.TERRAIN_SIZE
-                  );
-
-        return new Vector2Int(column, row);
-    }
-
-    private bool IsInsideMap(Vector2Int section)
-    {
-        bool isColumnInside = section.x >= 0 && section.x < _mapGenerator.ColumnCount;
-        bool isRowInside = section.y >= 0 && section.y < _mapGenerator.RowCount;
-
-        return isColumnInside && isRowInside;
-    }
-
-    // (열, 행) → 하이라이트를 놓을 월드 좌표
-    private Vector3 SectionToHighlightWorldPosition(Vector2Int section)
-    {
-        float x = section.x * MapGenerator.TERRAIN_SIZE;
-        float y = _groundHeight + _highlightOffset;
-        float z = (_mapGenerator.RowCount - 1 - section.y) * MapGenerator.TERRAIN_SIZE;
-
-        return new Vector3(x, y, z);
     }
 
     // 맵 밖을 가리키게 된 순간에만 숨김 처리

@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class UnitSelectWait : StateBase
 {
-    private const string ALLY_TEAMSIDE = "Ally";
-
     private readonly StateContext _stateContext;
     private readonly UnitGenerator _unitGenerator;
     private readonly UnitSelectDisplay _unitSelectDisplay;
@@ -32,7 +30,7 @@ public class UnitSelectWait : StateBase
     {
         // 유닛 유무 및 아군 판별
         bool isUnitExist = _unitGenerator.TryGetUnitAtSection(section, out MapUnit unit);
-        if (!isUnitExist || unit.SelectUnitData.TeamSide != ALLY_TEAMSIDE || 
+        if (!isUnitExist || unit.SelectUnitData.TeamSide != TeamSide.ALLY || 
             unit.IsUnitActionDone)
         {
             return null;

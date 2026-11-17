@@ -11,8 +11,10 @@ public class StateManager : MonoBehaviour
     private UnitSelectWait _unitSelectWait;
     private CommandSelect _commandSelect;
     private MoveSectionSelect _moveSectionSelect;
+    private AttackTargetSelect _attackTargetSelect;
     private StateBase _currentState;
     private readonly StateContext _stateContext = new();
+    private bool _isInputLocked; // 적 페이즈 중 플레이어 입력 차단
     
     public event Action<StateType> OnStateChanged;
 
@@ -25,6 +27,11 @@ public class StateManager : MonoBehaviour
     
     public void SectionClicked(Vector2Int section)
     {
+        if (_isInputLocked)
+        {
+            return;
+        }
+
         StateBase currentState = _currentState.SectionClick(section);
         if (currentState == null)
         {
@@ -36,13 +43,31 @@ public class StateManager : MonoBehaviour
 
     public void ButtonInputReceiver(CommandType command)
     {
+        if (_isInputLocked)
+        {
+            return;
+        }
+
         StateBase currentState = _currentState.PressButton(command);
         if (currentState == null)
         {
             return;
         }
-        
+
         ChangeNextState(currentState);
+    }
+
+    /// <summary>
+    /// 어느 상태에 있든 유닛 선택 대기로 되돌림. 현재 상태의 나가기와 대기 상태의 들어가기가 정리를 맡음
+    /// </summary>
+    public void ResetControlState()
+    {
+        ChangeNextState(_unitSelectWait);
+    }
+
+    public void SetInputLock(bool isLocked)
+    {
+        _isInputLocked = isLocked;
     }
     
     private void ChangeNextState(StateBase nextState)
@@ -62,11 +87,13 @@ public class StateManager : MonoBehaviour
         _moveSectionSelect = new MoveSectionSelect(_stateContext, calculator,
                                                    _mapGenerator, _unitGenerator,
                                                    _moveRangeDisplay);
+        _attackTargetSelect = new AttackTargetSelect(_stateContext);
 
         _unitSelectWait.SetStateBase(_commandSelect);
         _commandSelect.SetStateBase(moveState: _moveSectionSelect,
-                                    attackState: null, // 6단계에서 공격 대상 선택 연결
+                                    attackState: _attackTargetSelect,
                                     unitSelectState: _unitSelectWait);
         _moveSectionSelect.SetStateBase(_commandSelect);
+        _attackTargetSelect.SetStateBase(_commandSelect); // 임시 탈출 경로용
     }
 }

@@ -59,7 +59,6 @@ public class CommandSelect : StateBase
                 return _moveState;
 
             case CommandType.Attack:
-                // 6단계에서 공격 대상 선택 상태 연결 전까지 null (전환 없음)
                 return _attackState;
 
             case CommandType.Wait:

@@ -39,6 +39,7 @@ public class UnitSelectWait : StateBase
         }
         
         _stateContext.PutUnit(unit);
+        _unitSelectDisplay.ShowUnitIndicators(unit); // 클릭 시, 인디케이터 보여짐
         return _nextState;
     }
     

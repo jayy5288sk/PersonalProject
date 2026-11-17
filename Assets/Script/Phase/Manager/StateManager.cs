@@ -9,6 +9,7 @@ public class StateManager : MonoBehaviour
     [SerializeField] private UnitSelectDisplay _unitSelectDisplay;
     
     private UnitSelectWait _unitSelectWait;
+    private CommandSelect _commandSelect;
     private MoveSectionSelect _moveSectionSelect;
     private StateBase _currentState;
     private readonly StateContext _stateContext = new();
@@ -54,10 +55,15 @@ public class StateManager : MonoBehaviour
     {
         MovementRangeCalculator calculator = new MovementRangeCalculator();
         _unitSelectWait = new UnitSelectWait(_stateContext, _unitGenerator, _unitSelectDisplay);
+        _commandSelect = new CommandSelect(_stateContext, _unitSelectDisplay);
         _moveSectionSelect = new MoveSectionSelect(_stateContext, calculator,
                                                    _mapGenerator, _unitGenerator,
                                                    _moveRangeDisplay);
-        _unitSelectWait.SetStateBase(_moveSectionSelect);
-        _moveSectionSelect.SetStateBase(_unitSelectWait);
+
+        _unitSelectWait.SetStateBase(_commandSelect);
+        _commandSelect.SetStateBase(moveState: _moveSectionSelect,
+                                    attackState: null, // 6단계에서 공격 대상 선택 연결
+                                    unitSelectState: _unitSelectWait);
+        _moveSectionSelect.SetStateBase(_commandSelect);
     }
 }

@@ -38,8 +38,8 @@ public class UnitSelectWait : StateBase
             return null;
         }
         
+        // 선택 표시는 CommandSelect.StateEnter()에서 켬
         _stateContext.PutUnit(unit);
-        _unitSelectDisplay.ShowUnitIndicators(unit); // 클릭 시, 인디케이터 보여짐
         return _nextState;
     }
     

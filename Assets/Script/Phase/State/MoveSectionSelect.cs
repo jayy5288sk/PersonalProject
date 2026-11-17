@@ -71,10 +71,8 @@ public class MoveSectionSelect : StateBase
         {
             _unitGenerator.MoveUnitToSection(mapUnit, section);
             _stateContext.AlreadyMovedUnit();
-            
-            mapUnit.CompleteUnitAction();
         }
-        // UnitSelectWait가 들어올 때마다 컨텍스트를 비움. StateEnter() 참조.
+        // 이동 성공, 취소 모두 커맨드 선택으로 돌아감
         
         return _nextState;
     }

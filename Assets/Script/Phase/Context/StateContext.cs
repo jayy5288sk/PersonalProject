@@ -11,7 +11,7 @@ public class StateContext
         SelectedUnit = unit;
     }
     
-    public void MovedUnit()
+    public void AlreadyMovedUnit()
     {
         IsUnitMoved = true;
     }

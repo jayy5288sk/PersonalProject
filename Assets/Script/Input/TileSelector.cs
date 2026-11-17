@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public class TileSelector : MonoBehaviour
@@ -13,6 +14,7 @@ public class TileSelector : MonoBehaviour
     private Camera _camera;
     private bool _isMapGenerated;
     private bool _isMapInside;
+    private bool _isPointerOverUI; // 입력 콜백 안에서 UI 판정 시 경고가 나므로 Update에서 미리 계산
     private Vector2Int _currentSection = new(-1, -1); // 맵 어느 구역인지(열, 행)
     private Plane _groundCheckPlane; // 마우스 Ray 계산용 바닥 평면
     private GameObject _groundHighlight; // 지정된 프리팹(_highlightPrefab) 복사본 용도
@@ -25,6 +27,9 @@ public class TileSelector : MonoBehaviour
 
     private void Update()
     {
+        _isPointerOverUI = EventSystem.current != null &&
+                           EventSystem.current.IsPointerOverGameObject();
+
         // 맵이 준비되기 전에는 계산할 바닥 평면이 없음
         if (!_isMapGenerated)
         {
@@ -63,7 +68,8 @@ public class TileSelector : MonoBehaviour
     // 클릭 시 Update에서 계산해 둔 현재 칸을 그대로 사용
     private void HandleTileClick(InputAction.CallbackContext context)
     {
-        if (!_isMapInside)
+        // 버튼 클릭이 아래 칸 클릭으로 함께 처리되지 않도록 UI 위에서는 무시
+        if (!_isMapInside || _isPointerOverUI)
         {
             return;
         }

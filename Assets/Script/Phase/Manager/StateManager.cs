@@ -16,6 +16,9 @@ public class StateManager : MonoBehaviour
     
     public event Action<StateType> OnStateChanged;
 
+    // HUD 버튼 활성화용. 컨텍스트 자체는 공개하지 않고 필요한 값만 읽기 전용으로 공개
+    public bool IsSelectedUnitMoved => _stateContext.IsUnitMoved;
+
     private void Awake() => Init();
 
     private void Start() => ChangeNextState(_unitSelectWait);

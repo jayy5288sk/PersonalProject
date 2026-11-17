@@ -6,13 +6,16 @@ public class UnitSelectWait : StateBase
 
     private readonly StateContext _stateContext;
     private readonly UnitGenerator _unitGenerator;
+    private readonly UnitSelectDisplay _unitSelectDisplay;
 
     private StateBase _nextState;
 
-    public UnitSelectWait(StateContext stateContext, UnitGenerator unitGenerator)
+    public UnitSelectWait(StateContext stateContext, UnitGenerator unitGenerator, 
+                          UnitSelectDisplay unitSelectDisplay)
     {
         _stateContext = stateContext;
         _unitGenerator = unitGenerator;
+        _unitSelectDisplay = unitSelectDisplay;
     }
     
     public void SetStateBase(StateBase stateBase)
@@ -29,12 +32,19 @@ public class UnitSelectWait : StateBase
     {
         // 유닛 유무 및 아군 판별
         bool isUnitExist = _unitGenerator.TryGetUnitAtSection(section, out MapUnit unit);
-        if (!isUnitExist || unit.SelectUnitData.TeamSide != ALLY_TEAMSIDE)
+        if (!isUnitExist || unit.SelectUnitData.TeamSide != ALLY_TEAMSIDE || 
+            unit.IsUnitActionDone)
         {
             return null;
         }
         
         _stateContext.PutUnit(unit);
         return _nextState;
+    }
+    
+    public override void StateEnter()
+    {
+        _unitSelectDisplay.HideUnitIndicators();
+        _stateContext.EmptyStateContext();
     }
 }

@@ -6,6 +6,7 @@ public class StateManager : MonoBehaviour
     [SerializeField] private MapGenerator _mapGenerator;
     [SerializeField] private UnitGenerator _unitGenerator;
     [SerializeField] private MoveRangeDisplay _moveRangeDisplay;
+    [SerializeField] private UnitSelectDisplay _unitSelectDisplay;
     
     private UnitSelectWait _unitSelectWait;
     private MoveSectionSelect _moveSectionSelect;
@@ -52,7 +53,7 @@ public class StateManager : MonoBehaviour
     private void Init()
     {
         MovementRangeCalculator calculator = new MovementRangeCalculator();
-        _unitSelectWait = new UnitSelectWait(_stateContext, _unitGenerator);
+        _unitSelectWait = new UnitSelectWait(_stateContext, _unitGenerator, _unitSelectDisplay);
         _moveSectionSelect = new MoveSectionSelect(_stateContext, calculator,
                                                    _mapGenerator, _unitGenerator,
                                                    _moveRangeDisplay);

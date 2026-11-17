@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class MapUnit : MonoBehaviour
 {
-    private const float ACTION_DONE_DARKNESS = 0.5f;
+    private const float ACTION_DONE_BRIGTNESS = 0.5f;
     
     [SerializeField] private UnitData _selectUnitData;
     [SerializeField] private Vector2Int _sectionUnitPos;
@@ -25,10 +25,10 @@ public class MapUnit : MonoBehaviour
     public void CompleteUnitAction()
     {
         IsUnitActionDone = true;
-        _renderer.material.color = new Color(_originalColor.r*ACTION_DONE_DARKNESS,
-                                             _originalColor.g*ACTION_DONE_DARKNESS,
-                                             _originalColor.b*ACTION_DONE_DARKNESS,
-                                             _originalColor.a);
+        _renderer.material.color = new Color(_originalColor.r * ACTION_DONE_BRIGTNESS,
+                                             _originalColor.g * ACTION_DONE_BRIGTNESS,
+                                             _originalColor.b * ACTION_DONE_BRIGTNESS,
+                                               _originalColor.a);
     }
 
     public void ResetUnitAction()

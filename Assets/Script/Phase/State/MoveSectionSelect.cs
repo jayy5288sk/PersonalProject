@@ -72,10 +72,7 @@ public class MoveSectionSelect : StateBase
             _unitGenerator.MoveUnitToSection(mapUnit, section);
             _stateContext.AlreadyMovedUnit();
         }
-        else
-        {
-            _stateContext.EmptyStateContext();
-        }
+        // UnitSelectWait가 들어올 때마다 컨텍스트를 비움. StateEnter() 참조.
         
         return _nextState;
     }

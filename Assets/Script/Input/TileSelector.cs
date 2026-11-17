@@ -1,18 +1,14 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class TileSelector : MonoBehaviour
 {
-    private const string ALLY_TEAMSIDE = "Ally";
-    
     [SerializeField] private MapGenerator _mapGenerator;
-    [SerializeField] private UnitGenerator _unitGenerator;
-    [SerializeField] private MoveRangeDisplay _moveRangeDisplay;
     [SerializeField] private InputActionReference _terrainOverlap;
     [SerializeField] private InputActionReference _terrainClick;
     [SerializeField] private float _highlightOffset = 0.01f; // 바닥에서 하이라이트를 띄우는 거리
     [SerializeField] private GameObject _highlightPrefab;
+    [SerializeField] private StateManager _stateManager;
 
     private Camera _camera;
     private bool _isMapGenerated;
@@ -20,9 +16,6 @@ public class TileSelector : MonoBehaviour
     private Vector2Int _currentSection = new(-1, -1); // 맵 어느 구역인지(열, 행)
     private Plane _groundCheckPlane; // 마우스 Ray 계산용 바닥 평면
     private GameObject _groundHighlight; // 지정된 프리팹(_highlightPrefab) 복사본 용도
-    private MovementRangeCalculator _movementRangeCalculator;
-    private MapUnit _selectedUnit;
-    private Dictionary<Vector2Int, int> _destinationData;
 
     private void Awake() => Init();
 
@@ -75,64 +68,7 @@ public class TileSelector : MonoBehaviour
             return;
         }
 
-        Debug.Log($"클릭한 곳: 행 {_currentSection.y + 1}, 열 {_currentSection.x + 1}");
-
-        // 선택 상태: 선택 갈래만 실행하고 대기 갈래로 넘어가지 않음
-        if (_selectedUnit != null)
-        {
-            HandleSelectedStateClick(_currentSection);
-            return;
-        }
-
-        TrySelectUnit(_currentSection);
-    }
-
-    // 선택 상태의 클릭 처리. 숫자 칸이면 이동, 그 외 칸이면 취소
-    private void HandleSelectedStateClick(Vector2Int section)
-    {
-        if (_destinationData.ContainsKey(section))
-        {
-            _unitGenerator.MoveUnitToSection(_selectedUnit, section);
-        }
-
-        // 이동, 취소 공통: 표시 끄기 → 대기 상태로 되돌리기
-        _moveRangeDisplay.ClearHighlights();
-        _selectedUnit = null;
-        _destinationData = null;
-    }
-
-    private void TrySelectUnit(Vector2Int section)
-    {
-        // 유닛 유무 및 아군 판별
-        bool isUnitExist = _unitGenerator.TryGetUnitAtSection(section, out MapUnit unit);
-        if (!isUnitExist || unit.SelectUnitData.TeamSide != ALLY_TEAMSIDE)
-        {
-            return;
-        }
-
-        // 필요값 주입 및 결과값 저장
-        _destinationData = _movementRangeCalculator.GetReachableSections
-        (
-            unit.SectionUnitPos,
-            unit.SelectUnitData.MovementPoints,
-            unit.SelectUnitData.TeamSide,
-            _mapGenerator.TerrainBySection,
-            _unitGenerator.UnitsBySection
-        );
-
-        // 변환 및 정보 목록 등록
-        List<(Vector3 position, int cost)> highLightList = new();
-        foreach (KeyValuePair<Vector2Int, int> pair in _destinationData)
-        {
-            Vector3 position = (_mapGenerator.ReturnTerrainPosition(pair.Key) +
-                               (Vector3.up * _highlightOffset));
-            highLightList.Add((position, pair.Value));
-        }
-        
-        // 결과값 보여주기
-        _moveRangeDisplay.ShowMoveRangeHighlight(highLightList);
-        
-        _selectedUnit = unit;
+        _stateManager.SectionClicked(_currentSection);
     }
 
     // 마우스가 가리키는 칸을 계산하고, 칸이 바뀌었을 때만 하이라이트를 갱신
@@ -203,7 +139,5 @@ public class TileSelector : MonoBehaviour
                                        _highlightPrefab.transform.rotation);
 
         _groundHighlight.SetActive(false);
-        
-        _movementRangeCalculator = new MovementRangeCalculator();
     }
 }

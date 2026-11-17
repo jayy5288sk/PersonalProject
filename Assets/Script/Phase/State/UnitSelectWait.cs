@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class UnitSelectWait : StateBase
 {
@@ -8,7 +7,7 @@ public class UnitSelectWait : StateBase
     private readonly StateContext _stateContext;
     private readonly UnitGenerator _unitGenerator;
 
-    private StateBase _stateBase;
+    private StateBase _nextState;
 
     public UnitSelectWait(StateContext stateContext, UnitGenerator unitGenerator)
     {
@@ -18,7 +17,7 @@ public class UnitSelectWait : StateBase
     
     public void SetStateBase(StateBase stateBase)
     {
-        _stateBase = stateBase;
+        _nextState = stateBase;
     }
 
     public override StateType StateName()
@@ -36,6 +35,6 @@ public class UnitSelectWait : StateBase
         }
         
         _stateContext.PutUnit(unit);
-        return _stateBase;
+        return _nextState;
     }
 }

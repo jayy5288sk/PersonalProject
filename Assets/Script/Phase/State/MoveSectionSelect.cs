@@ -65,7 +65,8 @@ public class MoveSectionSelect : StateBase
     {
         MapUnit mapUnit = _stateContext.SelectedUnit;
         bool isExistSection = _availableSections.ContainsKey(section);
-        // 유닛 유무 및 아군 판별
+        
+        // 이동 가능 칸인지 판별
         if (isExistSection)
         {
             _unitGenerator.MoveUnitToSection(mapUnit, section);
@@ -81,7 +82,7 @@ public class MoveSectionSelect : StateBase
 
     public override void StateExit()
     {
-        // 이동, 취소 공통: 표시 끄기 → 대기 상태로 되돌리기
+        // 이동, 취소: 표시 끄기 → 목록 비우기
         _moveRangeDisplay.ClearHighlights();
         _availableSections.Clear();
     }

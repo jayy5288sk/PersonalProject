@@ -53,7 +53,7 @@
 - What : 시작 값: 스폰 시 `CurrentHp = MaxHealth`, `CurrentEn = MaxEnergy`
 - What : 감소: `CurrentHp = max(0, 반올림(CurrentHp - 데미지))`. EN도 같은 방식(`ConsumeEnergy`)
 - What : 반올림: `Math.Round` 기본값(은행원 반올림, .5는 가까운 짝수로). v1은 정수 데미지만 있어 영향 없음
-- What : HP 0: 0 아래로 내려가지 않는다. 격파·제거는 아직 없음(F-09). 현재는 HP 0 유닛도 맵에 남고 다시 맞을 수 있다 (`IsDefeated`가 판정 출발점)
+- What : HP 0: 0 아래로 내려가지 않는다. HP 0이 되면(`IsDefeated`) `AttackExecutor`가 `UnitGenerator.RemoveUnit`으로 맵에서 제거한다 (F-09 최소 구현)
 - What : 회복: 없음
 - Where: `Assets/Script/Unit/MapUnit.cs` (`TakeDamage`, `InitBattleStatus`, `IsDefeated`), `Assets/Script/Interface/`
 - Tune : 유닛별 최대 HP (유닛 TSV 시트)
@@ -85,4 +85,4 @@
 ---
 
 ## TODO
-- 방어·지형 보정식 v2 (F-17 숲 회피 보너스), HP 0 격파 처리 (F-09), 예상 전투 결과 표시 (F-07, 11/19 UI), 적 AI 점수 계산에 `BattleCalculator` 재사용 (F-08), 시트에 소수 공격력이 들어오면 `int.TryParse` 실패로 그 행이 적용되지 않음 (시트 형식 확인 필요), EN·HP 회복 규칙 필요 여부
+- 방어·지형 보정식 v2 (F-17 숲 회피 보너스), ~~HP 0 격파 처리 (F-09)~~, 예상 전투 결과 표시 (F-07, 11/19 UI), ~~적 AI 점수 계산에 `BattleCalculator` 재사용 (F-08)~~, 시트에 소수 공격력이 들어오면 `int.TryParse` 실패로 그 행이 적용되지 않음 (시트 형식 확인 필요), EN·HP 회복 규칙 필요 여부

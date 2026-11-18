@@ -49,7 +49,7 @@ flowchart TB
         direction TB
         SpawnSheet[("스테이지 스폰 TSV 시트")]
         SpawnLoader["<b>UnitSpawnDataLoader</b><br/>LoadUnitSpawnTable()"]
-        SpawnArray["<b>UnitSpawnArray (JArray)</b><br/>[행][열] = 유닛 ID"]
+        SpawnArray["<b>UnitSpawnArray (JArray)</b><br/>[행][열] = { Id, Behavior }<br/>칸 형식: ID 또는 ID:A / ID:D"]
         SpawnSheet -->|다운로드| SpawnLoader
         SpawnLoader -->|변환 후 보관| SpawnArray
     end
@@ -111,7 +111,7 @@ flowchart LR
     Skip["그 칸 건너뜀"]
     Err["에러 로그 후<br/>그 칸 건너뜀"]
     Spawn["<b>Instantiate</b><br/>SectionToUnitPosition()<br/>UnitGenerator의 자식으로 생성"]
-    MU["<b>MapUnit</b><br/>AddComponent 즉시 Awake:<br/>Renderer·원래 색 저장<br/>SetUnitData(UnitData, 칸)"]
+    MU["<b>MapUnit</b><br/>AddComponent 즉시 Awake:<br/>Renderer·원래 색 저장<br/>SetUnitData(UnitData, 칸)<br/>SetBehaviorType(행동 유형, F-08)"]
     Dict["<b>유닛 사전</b><br/>UnitsBySection<br/>칸 → MapUnit"]
     Done(["OnUnitPlacementCompleted"])
     Phase["<b>PhaseManager</b><br/>첫 아군 페이즈 시작 (F-04)"]
@@ -280,14 +280,17 @@ flowchart LR
 flowchart TB
     Placed(["OnUnitPlacementCompleted"]) --> Ally
     Ally["<b>AllyPhase</b><br/>들어가기: 모든 아군 ResetUnitAction<br/>StateManager.ResetControlState()<br/>→ null (머무름)"]
-    Enemy["<b>EnemyPhase</b><br/>들어가기: SetInputLock(true)<br/>→ AllyPhase 반환 (임시 즉시 복귀)<br/>나가기: SetInputLock(false)"]
+    Enemy["<b>EnemyPhase</b><br/>들어가기: SetInputLock(true)<br/>EnemyAIController.StartEnemyTurn()<br/>→ null (머무름)<br/>나가기: SetInputLock(false)"]
+    AI["<b>EnemyAIController</b><br/>적 턴 코루틴<br/>→ 적 AI (F-08) 참고"]
+    Done(["OnEnemyTurnCompleted<br/>적 페이즈일 때만"])
 
     Check{"UnitSelectStandBy 수신 시<br/>아군 전원 행동 완료?<br/>(아군 0명이면 아니오)"}
     Ally --> Check
     Check -->|예| Enemy
     Turn(["턴 종료 버튼<br/>RequestTurnEnd()<br/>아군 페이즈일 때만"]) --> Enemy
-    Enemy -->|임시| Ally
-    Enemy -.->|미구현, F-08| AI["적 AI 행동 후 아군 페이즈"]
+    Enemy --> AI
+    AI -.-> Done
+    Done --> Ally
 ```
 
 ### 페이즈 전환 처리 순서 (ChangePhase)
@@ -357,15 +360,61 @@ flowchart TB
     Click["칸 클릭"] --> InRange{"고를 수 있는 칸?"}
     InRange -->|아니오| Cancel["WeaponSelect 반환<br/>(취소)"]
     InRange -->|예| Hit["ApplyAttackSection()<br/>맞는 칸 구하기"]
-    Hit --> Pick["<b>UnitGenerator</b><br/>TryGetUnitAtSection()<br/>공격자와 다른 진영만 대상"]
+    Hit --> Pick["<b>AttackExecutor</b><br/>CollectTargets()<br/>공격자와 다른 진영만 대상"]
     Pick --> Any{"대상 있음?"}
     Any -->|아니오| Ignore["null 반환<br/>(무시, 범위 표시 유지)"]
-    Any -->|예| Dmg["대상마다<br/><b>BattleCalculator</b>.CalculateDamage()<br/>→ TakeDamage()"]
-    Dmg --> En["ConsumeEnergy(RequireEn)<br/>공격 1회당 1번"]
-    En --> Done["CompleteUnitAction()"]
+    Any -->|예| Exec["<b>AttackExecutor</b><br/>Execute()<br/>→ 공격 실행 공용 처리 참고"]
+    Exec --> Done["CompleteUnitAction()"]
     Done --> Ret["UnitSelectWait 반환"]
     Ret -.->|OnStateChanged| PM["<b>PhaseManager</b><br/>아군 전원 완료 확인"]
-    Dmg -.->|미구현, F-09| Dead["HP 0 유닛 격파 처리"]
+```
+
+### 공격 실행 공용 처리 (AttackExecutor, F-07, F-09)
+
+```mermaid
+flowchart LR
+    In["Execute()<br/>공격자, 무장, 대상 목록"] --> Loop{"남은 대상?"}
+    Loop -->|예| Dmg["<b>BattleCalculator</b><br/>CalculateDamage()<br/>→ TakeDamage()"]
+    Dmg --> Dead{"IsDefeated?"}
+    Dead -->|예| Rm["<b>UnitGenerator</b><br/>RemoveUnit()<br/>사전에서 제거 · Destroy"]
+    Dead -->|아니오| Loop
+    Rm --> Loop
+    Loop -->|아니오| En["ConsumeEnergy(RequireEn)<br/>공격 1회당 1번"]
+```
+
+> 아군(`AttackTargetSelect`)과 적(`EnemyAIController`)이 같은 처리를 쓴다.
+
+## 적 AI (F-08)
+
+### 적 턴 처리 순서 (EnemyAIController 코루틴)
+
+```mermaid
+flowchart TB
+    Start["StartEnemyTurn()<br/>(EnemyPhase 들어가기)"] --> Copy["GetUnitsByTeam(ENEMY)<br/>적 목록 복사"]
+    Copy --> Loop{"남은 적?"}
+    Loop -->|예| Wait["대기 _actionDelay"]
+    Wait --> Act["ActEnemy()"]
+    Act --> Done["CompleteUnitAction()"]
+    Done --> Loop
+    Loop -->|아니오| Last["대기 _actionDelay<br/>(적 0기여도 대기)"]
+    Last --> Reset["적 전원 ResetUnitAction()"]
+    Reset --> Evt(["OnEnemyTurnCompleted"])
+    Evt -.->|구독| PM["<b>PhaseManager</b><br/>아군 페이즈로 전환"]
+```
+
+> `StartCoroutine`은 첫 `yield`까지 바로 실행되므로, 완료 이벤트는 반드시 대기 뒤에 나간다.
+
+### 행동 결정 (ActEnemy)
+
+```mermaid
+flowchart TB
+    In["<b>MovementRangeCalculator</b><br/>이동 가능 칸 계산"] --> Find["TryFindBestAttack()<br/>서는 칸(제자리 + 이동 가능 칸)<br/>× EN 충분한 무장<br/>× 상대 진영 유닛 칸 클릭"]
+    Find --> Score["조합마다 점수<br/>Σ min(데미지, 대상 HP)<br/>+ 격파 수 × _defeatScoreBonus"]
+    Score --> Any{"0점보다 큰<br/>조합 있음?"}
+    Any -->|예| Atk["AttackFrom()<br/>MoveUnitToSection() (칸이 다르면)<br/>→ AttackExecutor.Execute()"]
+    Any -->|아니오| Type{"BehaviorType"}
+    Type -->|Assault 돌격형| Near["MoveTowardNearestAlly()<br/>아군 칸 출발 다익스트라 (이동력 무제한)<br/>→ 값이 가장 작은 이동 가능 칸으로"]
+    Type -->|Defend 거점형| Stay["제자리 대기"]
 ```
 
 ### 공격 범위 표시 (AttackRangeDisplay, 오브젝트 풀)

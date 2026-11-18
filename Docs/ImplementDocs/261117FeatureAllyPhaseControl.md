@@ -77,4 +77,4 @@
 ---
 
 ## TODO
-- ~~공격 대상 선택 실제 처리와 임시 탈출 경로 교체 (F-06)~~, 적 AI 연결과 적 페이즈 즉시 복귀 교체 (F-08), 아군 0명일 때 패배 처리 (F-09), 메뉴·버튼 외형과 페이즈 전환 중앙 UI (F-10), 선택 중 다른 아군 클릭 시 바로 전환, `TempLog` 출시 전 제거, `MoveSectionSelect` 하이라이트 리스트 재사용, 이름 정리 (`ButtonInputReceiver`, `AlreadyMovedUnit`, `UnitSelectStandBy`/`UnitSelectWait`), 프리팹 원본(`StateManager`, `UnitSelectDisplay`, `PhaseManager`, `CommandUI`)의 씬 참조 칸이 비어 있음 (다른 씬 배치 시 재연결), `TileSelector`의 `(-1, -1)` 상수화
+- ~~공격 대상 선택 실제 처리와 임시 탈출 경로 교체 (F-06)~~, ~~적 AI 연결과 적 페이즈 즉시 복귀 교체 (F-08)~~, 아군 0명일 때 패배 처리 (F-09), 메뉴·버튼 외형과 페이즈 전환 중앙 UI (F-10), 선택 중 다른 아군 클릭 시 바로 전환, `TempLog` 출시 전 제거, `MoveSectionSelect` 하이라이트 리스트 재사용, 이름 정리 (`ButtonInputReceiver`, `AlreadyMovedUnit`, `UnitSelectStandBy`/`UnitSelectWait`), 프리팹 원본(`StateManager`, `UnitSelectDisplay`, `PhaseManager`, `CommandUI`)의 씬 참조 칸이 비어 있음 (다른 씬 배치 시 재연결), `TileSelector`의 `(-1, -1)` 상수화

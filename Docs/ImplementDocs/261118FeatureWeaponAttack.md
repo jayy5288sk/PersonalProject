@@ -69,4 +69,4 @@
 ---
 
 ## TODO
-- HP 0 유닛 격파·제거 (F-09), 예상 전투 결과 UI와 무장 설명 툴팁 (11/19 UI), 적 AI에서 범위·데미지 계산기 재사용 (F-08), 지형·방어 보정 계산식 (F-17), 확인용 로그(`WeaponSelect` 들어가기, 공격·EN 로그) 출시 전 정리, 시트 `AttackDamage`는 `float`·코드는 `int`, `WeaponSelect.cs` 위치(`Unit/`) 정리 여부, `WeaponListHUD`의 주석 처리된 `_weaponTexts` 정리
+- ~~HP 0 유닛 격파·제거 (F-09)~~, 예상 전투 결과 UI와 무장 설명 툴팁 (11/19 UI), ~~적 AI에서 범위·데미지 계산기 재사용 (F-08)~~, 지형·방어 보정 계산식 (F-17), 확인용 로그(`WeaponSelect` 들어가기, 공격·EN 로그) 출시 전 정리, 시트 `AttackDamage`는 `float`·코드는 `int`, `WeaponSelect.cs` 위치(`Unit/`) 정리 여부, `WeaponListHUD`의 주석 처리된 `_weaponTexts` 정리

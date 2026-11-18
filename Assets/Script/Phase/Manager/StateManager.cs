@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class StateManager : MonoBehaviour
@@ -16,6 +17,9 @@ public class StateManager : MonoBehaviour
     private StateBase _currentState;
     private readonly StateContext _stateContext = new();
     private bool _isInputLocked; // 적 페이즈 중 플레이어 입력 차단
+
+    public IReadOnlyList<WeaponData> SelectedUnitWeapon 
+           => _stateContext.SelectedUnit?.WeaponDataList;
     
     public event Action<StateType> OnStateChanged;
 
@@ -94,6 +98,17 @@ public class StateManager : MonoBehaviour
         _currentState.StateEnter();
         // 상태 변경 채널에 구독자가 있으면, 새 상태의 이름표를 실어서 방송
         OnStateChanged?.Invoke(_currentState.StateName());
+    }
+    
+    public bool CanSelectedUnitUseWeapon(int weaponIndex)
+    {
+        MapUnit unit = _stateContext.SelectedUnit;
+        if (unit == null || weaponIndex < 0 || weaponIndex >= unit.WeaponDataList.Count)
+        {
+            return false;
+        }
+
+        return unit.CanUseWeapon(unit.WeaponDataList[weaponIndex]);
     }
 
     private void Init()

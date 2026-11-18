@@ -8,6 +8,7 @@ public class StateManager : MonoBehaviour
     [SerializeField] private UnitGenerator _unitGenerator;
     [SerializeField] private MoveRangeDisplay _moveRangeDisplay;
     [SerializeField] private UnitSelectDisplay _unitSelectDisplay;
+    [SerializeField] private AttackRangeDisplay _attackRangeDisplay;
     
     private UnitSelectWait _unitSelectWait;
     private CommandSelect _commandSelect;
@@ -113,13 +114,17 @@ public class StateManager : MonoBehaviour
 
     private void Init()
     {
-        MovementRangeCalculator calculator = new MovementRangeCalculator();
+        MovementRangeCalculator moveCalculator = new MovementRangeCalculator();
+        AttackRangeCalculator attackCalculator = new AttackRangeCalculator();
         _unitSelectWait = new UnitSelectWait(_stateContext, _unitGenerator, _unitSelectDisplay);
         _commandSelect = new CommandSelect(_stateContext, _unitSelectDisplay);
-        _moveSectionSelect = new MoveSectionSelect(_stateContext, calculator,
+        _moveSectionSelect = new MoveSectionSelect(_stateContext, moveCalculator,
                                                    _mapGenerator, _unitGenerator,
                                                    _moveRangeDisplay);
-        _attackTargetSelect = new AttackTargetSelect(_stateContext);
+        _attackTargetSelect = new AttackTargetSelect(_stateContext, 
+                                                     attackCalculator,
+                                                     _mapGenerator, 
+                                                     _attackRangeDisplay);
         _weaponSelect = new WeaponSelect(_stateContext);
         
         _unitSelectWait.SetStateBase(_commandSelect);

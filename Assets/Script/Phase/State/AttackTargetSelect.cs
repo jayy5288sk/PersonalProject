@@ -1,15 +1,28 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class AttackTargetSelect : StateBase
 {
     private readonly StateContext _stateContext;
+    private readonly AttackRangeCalculator _attackRangeCalculator;
+    private readonly MapGenerator _mapGenerator;
+    private readonly AttackRangeDisplay _attackRangeDisplay;
 
     private StateBase _doneState;
     private StateBase _cancelState;
-
-    public AttackTargetSelect(StateContext stateContext)
+    
+    private HashSet<Vector2Int> _attackSections = new();
+    private List<Vector3> _highlightPosition = new();
+    
+    public AttackTargetSelect(StateContext stateContext,
+                              AttackRangeCalculator calculator,
+                              MapGenerator mapGenerator,
+                              AttackRangeDisplay display)
     {
         _stateContext = stateContext;
+        _attackRangeCalculator = calculator;
+        _mapGenerator = mapGenerator;
+        _attackRangeDisplay = display;
     }
 
     public void SetStateBase(StateBase done, StateBase cancel)
@@ -25,7 +38,20 @@ public class AttackTargetSelect : StateBase
 
     public override void StateEnter()
     {
-        Debug.Log($"{_stateContext.SelectedUnit.name} 공격 대상 선택");
+        MapUnit mapUnit = _stateContext.SelectedUnit;
+
+        _attackRangeCalculator.GetAttackableSections(mapUnit.SectionUnitPos,
+                                                     _stateContext.SelectedWeapon,
+                                                     _mapGenerator.IsInsideMap,
+                                                     _attackSections);
+        _highlightPosition.Clear();
+        //_attackSections
+    }
+
+    public override void StateExit()
+    {
+        _attackRangeDisplay.ClearHighlights();
+        _attackSections.Clear();
     }
 
     public override StateBase SectionClick(Vector2Int section)

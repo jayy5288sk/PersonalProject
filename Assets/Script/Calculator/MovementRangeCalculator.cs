@@ -14,23 +14,23 @@ public class MovementRangeCalculator
     };
 
     /// <summary>
-    /// 출발 칸에서 이동력 안에 갈 수 있는 칸과 그 칸까지 드는 누적 비용을 돌려준다.
+    /// 출발 칸에서 이동력 안에 갈 수 있는 칸과 그 칸까지 드는 누적 비용을 돌려준다.(다익스트라)
     /// </summary>
     public Dictionary<Vector2Int, int> GetReachableSections(Vector2Int startSection, int movementPoints, string teamSide,
                                                             IReadOnlyDictionary<Vector2Int, TerrainData> terrainBySection,
                                                             IReadOnlyDictionary<Vector2Int, MapUnit> unitsBySection)
     {
-        Dictionary<Vector2Int, int> reachableSections = new();
-        List<Vector2Int> neighbours = new();
+        Dictionary<Vector2Int, int> reachableSections = new(); // 칸 별 최단 비용 기록
+        List<Vector2Int> neighbours = new(); // 비용 처리 후보 목록
         
-        reachableSections[startSection] = 0;
-        neighbours.Add(startSection);
+        reachableSections[startSection] = 0; // 출발점 비용 0 처리
+        neighbours.Add(startSection); // 비용 처리 후보 목록에 출발점 포함
 
-        while (neighbours.Count > 0)
+        while (neighbours.Count > 0) // neighbours 배열이 빌 때까지
         {
-            int cheapestIndex = 0; // 가장 비용이 싼 지점
+            int cheapestIndex = 0; // 가장 비용이 싼 지점 지역 변수
 
-            // 이웃한 곳에서 이동력이 적게 드는 곳을 찾기
+            // 이웃한 곳에서 이동력이 적게 드는 곳을 찾기 
             for (int i = 1; i < neighbours.Count; i++)
             {
                 if (reachableSections[neighbours[i]] < reachableSections[neighbours[cheapestIndex]])
@@ -39,11 +39,11 @@ public class MovementRangeCalculator
                 }
             }
             
-            // 해당하는 곳을 담고 난 다음 후보 목록에서 지우기
+            // 해당하는 곳을 담고 난 다음 후보 목록에서 지우기 (가장 싼 비용의 칸 꺼내기)
             Vector2Int currentSection = neighbours[cheapestIndex];
             neighbours.RemoveAt(cheapestIndex);
 
-            // 해당 칸에 이웃하는 4방향 확인
+            // 해당 칸에 이웃하는 4방향 확인 
             foreach (Vector2Int direction in DIRECTIONS)
             {
                 Vector2Int nextSection = currentSection + direction; // 이웃 칸
@@ -72,7 +72,8 @@ public class MovementRangeCalculator
                 {
                     continue;
                 }
-                // 5. 비용 비교
+                
+                // 5. 비용 비교 (5, 6을 통해 비용 비교 후 바꿈)
                 bool isRecorded = reachableSections.TryGetValue(nextSection, out int costMovement);
                 if (isRecorded && costMovement <= expansePoint)
                 {

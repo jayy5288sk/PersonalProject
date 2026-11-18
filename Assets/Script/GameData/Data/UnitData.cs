@@ -9,8 +9,8 @@ public class UnitData : ScriptableObject
     [SerializeField] private int _maxHealth;
     [SerializeField] private int _maxEnergy;
     [SerializeField] private int _movementPoints;
-    [SerializeField] private string _basicWeapon;
-    [SerializeField] private string _expandedWeapon;
+    [SerializeField] private int _basicWeapon;
+    [SerializeField] private int _expandedWeapon;
     [SerializeField] private string _teamSide;
     
     [SerializeField] private GameObject _unitPrefab;
@@ -20,13 +20,13 @@ public class UnitData : ScriptableObject
     public int MaxHealth => _maxHealth;
     public int MaxEnergy => _maxEnergy;
     public int MovementPoints => _movementPoints;
-    public string BasicWeapon => _basicWeapon;
-    public string ExpandedWeapon => _expandedWeapon;
+    public int BasicWeapon => _basicWeapon;
+    public int ExpandedWeapon => _expandedWeapon;
     public string TeamSide => _teamSide;
     public GameObject UnitPrefab => _unitPrefab;
     
     public void SetData(int id, string unitName, int maxHealth, int maxEnergy, 
-                        int movementPoints, string basicWeapon, string expandedWeapon,
+                        int movementPoints, int basicWeapon, int expandedWeapon,
                         string teamSide)
     {
         _id = id;

@@ -10,7 +10,13 @@ public class UnitSpawnDataLoader : MonoBehaviour
 
     private const int INVALID_UNIT_ID = -1;
     private const int EMPTY_UNIT = 0; // 유닛 없음. 유닛 ID로 사용하지 않음.
-    
+    private const char BEHAVIOR_SEPARATOR = ':'; // 칸 형식: "유닛ID" 또는 "유닛ID:행동코드"
+    private const EnemyBehaviorType DEFAULT_BEHAVIOR = EnemyBehaviorType.Assault; // 행동코드 생략 시
+
+    // 스폰 칸 JObject의 키. UnitGenerator가 같은 키로 읽는다
+    public const string SPAWN_ID_KEY = "Id";
+    public const string SPAWN_BEHAVIOR_KEY = "Behavior";
+
     public JArray UnitSpawnArray { get; private set; }
 
     public IEnumerator LoadUnitSpawnTable()
@@ -103,28 +109,68 @@ public class UnitSpawnDataLoader : MonoBehaviour
         // 한 행의 데이터 변환
         for (int i = 0; i < values.Length; i++)
         {
-            values[i] = values[i].Trim();
-
-            // 빈 칸일 경우(유닛 없음)
-            if (values[i] == "")
-            {
-                rowArray.Add(EMPTY_UNIT);
-            }
-            
-            // 해당 ID로 변환
-            else if (int.TryParse(values[i], out int id))
-            {
-                rowArray.Add(id);
-            }
-            
-            else 
-            {
-                Debug.LogError($"{rowIndex}행 {i + 1}열 '{values[i]}'값 문제 발생");
-                rowArray.Add(INVALID_UNIT_ID);
-            }
+            rowArray.Add(ParseCell(values[i].Trim(), rowIndex, i + 1));
         }
 
         // 만든 rowArray 반환
         return rowArray;
+    }
+
+    // 한 칸을 { Id, Behavior } JObject로 변환
+    private JObject ParseCell(string value, int rowIndex, int columnIndex)
+    {
+        // 빈 칸일 경우(유닛 없음)
+        if (value == "")
+        {
+            return CreateSpawnCell(EMPTY_UNIT, DEFAULT_BEHAVIOR);
+        }
+
+        string[] parts = value.Split(BEHAVIOR_SEPARATOR);
+
+        // ID 변환 실패, 또는 구분자가 2개 이상
+        if (parts.Length > 2 || !int.TryParse(parts[0].Trim(), out int id))
+        {
+            Debug.LogError($"{rowIndex}행 {columnIndex}열 '{value}'값 문제 발생");
+            return CreateSpawnCell(INVALID_UNIT_ID, DEFAULT_BEHAVIOR);
+        }
+
+        // 행동코드 생략
+        if (parts.Length == 1)
+        {
+            return CreateSpawnCell(id, DEFAULT_BEHAVIOR);
+        }
+
+        if (!TryParseBehavior(parts[1].Trim(), out EnemyBehaviorType behavior))
+        {
+            Debug.LogError($"{rowIndex}행 {columnIndex}열 '{value}' 알 수 없는 행동코드. 돌격형으로 처리");
+        }
+
+        return CreateSpawnCell(id, behavior);
+    }
+
+    // 행동코드 → 행동 유형. 실패 시 기본 유형
+    private bool TryParseBehavior(string code, out EnemyBehaviorType behavior)
+    {
+        switch (code)
+        {
+            case "A":
+                behavior = EnemyBehaviorType.Assault;
+                return true;
+            case "D":
+                behavior = EnemyBehaviorType.Defend;
+                return true;
+            default:
+                behavior = DEFAULT_BEHAVIOR;
+                return false;
+        }
+    }
+
+    private JObject CreateSpawnCell(int id, EnemyBehaviorType behavior)
+    {
+        return new JObject
+        {
+            [SPAWN_ID_KEY] = id,
+            [SPAWN_BEHAVIOR_KEY] = (int)behavior
+        };
     }
 }

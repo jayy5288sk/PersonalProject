@@ -1,17 +1,12 @@
 public class EnemyPhase : PhaseBase
 {
     private readonly StateManager _stateManager;
+    private readonly EnemyAIController _enemyAIController;
 
-    private PhaseBase _nextPhase;
-
-    public EnemyPhase(StateManager stateManager)
+    public EnemyPhase(StateManager stateManager, EnemyAIController enemyAIController)
     {
         _stateManager = stateManager;
-    }
-
-    public void SetPhaseBase(PhaseBase phaseBase)
-    {
-        _nextPhase = phaseBase;
+        _enemyAIController = enemyAIController;
     }
 
     public override PhaseType PhaseName()
@@ -24,8 +19,9 @@ public class EnemyPhase : PhaseBase
         // 적 페이즈 동안 플레이어 클릭·버튼 입력 차단
         _stateManager.SetInputLock(true);
 
-        // 임시: 적 AI가 없으므로 바로 아군 페이즈로 복귀. F-08에서 적 AI 연결 후 null 반환으로 교체
-        return _nextPhase;
+        // 적 행동은 대기 시간이 있어 바로 끝나지 않음. 완료 시 PhaseManager가 아군 페이즈로 전환
+        _enemyAIController.StartEnemyTurn();
+        return null;
     }
 
     public override void PhaseExit()

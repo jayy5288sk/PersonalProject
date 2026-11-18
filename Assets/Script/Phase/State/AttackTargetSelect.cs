@@ -78,15 +78,7 @@ public class AttackTargetSelect : StateBase
         // 맞는 칸을 구하고, 그 칸에 있는 공격자와 다른 진영의 유닛만 모은다
         _attackRangeCalculator.ApplyAttackSection(attacker.SectionUnitPos, weapon, section,
                                                   _attackSections, _hitSections);
-        _targets.Clear();
-        foreach (Vector2Int hit in _hitSections)
-        {
-            if (_unitGenerator.TryGetUnitAtSection(hit, out MapUnit unit) &&
-                unit.SelectUnitData.TeamSide != attacker.SelectUnitData.TeamSide)
-            {
-                _targets.Add(unit);
-            }
-        }
+        AttackExecutor.CollectTargets(attacker, _hitSections, _unitGenerator, _targets);
 
         // 범위 안이지만 맞을 적이 없음(빈 칸, 아군 칸) → 무시
         if (_targets.Count == 0)
@@ -94,16 +86,7 @@ public class AttackTargetSelect : StateBase
             return null;
         }
 
-        foreach (MapUnit target in _targets)
-        {
-            int damage = BattleCalculator.CalculateDamage(attacker, weapon, target);
-            target.TakeDamage(damage);
-            Debug.Log($"{attacker.name} → {target.name} : {damage} (남은 HP {target.CurrentHp})");
-        }
-        
-        // 맞힌 적의 수와 상관없이 공격 1회당 1번만 소모
-        attacker.ConsumeEnergy(weapon.RequireEn);
-        Debug.Log($"{attacker.name} EN 소모 : {weapon.RequireEn} (남은 EN {attacker.CurrentEn})");
+        AttackExecutor.Execute(attacker, weapon, _targets, _unitGenerator);
 
         attacker.CompleteUnitAction();
         return _doneState;

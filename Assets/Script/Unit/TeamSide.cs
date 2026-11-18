@@ -2,4 +2,5 @@
 public static class TeamSide
 {
     public const string ALLY = "Ally";
+    public const string ENEMY = "Enemy";
 }

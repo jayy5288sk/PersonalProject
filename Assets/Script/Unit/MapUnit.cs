@@ -21,6 +21,7 @@ public class MapUnit : MonoBehaviour, IDamageable, IEnergyUsable
         => CurrentEn >= weapon.RequireEn; // 잔존 에너지가 무장 소모 에너지보다 많아야 무장 사용 가능.
     public IReadOnlyList<WeaponData> WeaponDataList => _weaponDataList;
     
+    public EnemyBehaviorType BehaviorType { get; private set; } // 적 AI만 사용
     public bool IsUnitActionDone { get; private set; }
     public int CurrentHp { get; private set; }
     public int CurrentEn { get; private set; }
@@ -31,6 +32,11 @@ public class MapUnit : MonoBehaviour, IDamageable, IEnergyUsable
     {
         _selectUnitData = unitData;
         _sectionUnitPos = sectionUnitPos;
+    }
+
+    public void SetBehaviorType(EnemyBehaviorType behaviorType)
+    {
+        BehaviorType = behaviorType;
     }
 
     public void CompleteUnitAction()

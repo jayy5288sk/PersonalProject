@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class StateManager : MonoBehaviour
@@ -7,14 +8,19 @@ public class StateManager : MonoBehaviour
     [SerializeField] private UnitGenerator _unitGenerator;
     [SerializeField] private MoveRangeDisplay _moveRangeDisplay;
     [SerializeField] private UnitSelectDisplay _unitSelectDisplay;
+    [SerializeField] private AttackRangeDisplay _attackRangeDisplay;
     
     private UnitSelectWait _unitSelectWait;
     private CommandSelect _commandSelect;
     private MoveSectionSelect _moveSectionSelect;
     private AttackTargetSelect _attackTargetSelect;
+    private WeaponSelect _weaponSelect;
     private StateBase _currentState;
     private readonly StateContext _stateContext = new();
     private bool _isInputLocked; // 적 페이즈 중 플레이어 입력 차단
+
+    public IReadOnlyList<WeaponData> SelectedUnitWeapon 
+           => _stateContext.SelectedUnit?.WeaponDataList;
     
     public event Action<StateType> OnStateChanged;
 
@@ -57,6 +63,22 @@ public class StateManager : MonoBehaviour
         ChangeNextState(nextState);
     }
 
+    public void WeaponInputReceiver(int weaponIndex)
+    {
+        if (_isInputLocked)
+        {
+            return;
+        }
+
+        StateBase nextState = _currentState.SelectWeapon(weaponIndex);
+        if (nextState == null)
+        {
+            return;
+        }
+
+        ChangeNextState(nextState);
+    }
+
     /// <summary>
     /// 어느 상태에 있든 유닛 선택 대기로 되돌림. 현재 상태의 나가기와 대기 상태의 들어가기가 정리를 맡음
     /// </summary>
@@ -78,22 +100,42 @@ public class StateManager : MonoBehaviour
         // 상태 변경 채널에 구독자가 있으면, 새 상태의 이름표를 실어서 방송
         OnStateChanged?.Invoke(_currentState.StateName());
     }
+    
+    public bool CanSelectedUnitUseWeapon(int weaponIndex)
+    {
+        MapUnit unit = _stateContext.SelectedUnit;
+        if (unit == null || weaponIndex < 0 || weaponIndex >= unit.WeaponDataList.Count)
+        {
+            return false;
+        }
+
+        return unit.CanUseWeapon(unit.WeaponDataList[weaponIndex]);
+    }
 
     private void Init()
     {
-        MovementRangeCalculator calculator = new MovementRangeCalculator();
+        MovementRangeCalculator moveCalculator = new MovementRangeCalculator();
+        AttackRangeCalculator attackCalculator = new AttackRangeCalculator();
         _unitSelectWait = new UnitSelectWait(_stateContext, _unitGenerator, _unitSelectDisplay);
         _commandSelect = new CommandSelect(_stateContext, _unitSelectDisplay);
-        _moveSectionSelect = new MoveSectionSelect(_stateContext, calculator,
+        _moveSectionSelect = new MoveSectionSelect(_stateContext, moveCalculator,
                                                    _mapGenerator, _unitGenerator,
                                                    _moveRangeDisplay);
-        _attackTargetSelect = new AttackTargetSelect(_stateContext);
-
+        _attackTargetSelect = new AttackTargetSelect(_stateContext, 
+                                                     attackCalculator,
+                                                     _mapGenerator,
+                                                     _unitGenerator,
+                                                     _attackRangeDisplay);
+        _weaponSelect = new WeaponSelect(_stateContext);
+        
         _unitSelectWait.SetStateBase(_commandSelect);
         _commandSelect.SetStateBase(moveState: _moveSectionSelect,
-                                    attackState: _attackTargetSelect,
+                                    attackState: _weaponSelect,
                                     unitSelectState: _unitSelectWait);
+        _weaponSelect.SetStateBase(targetState: _attackTargetSelect,
+                                   cancelState: _commandSelect);
         _moveSectionSelect.SetStateBase(_commandSelect);
-        _attackTargetSelect.SetStateBase(_commandSelect); // 임시 탈출 경로용
+        _attackTargetSelect.SetStateBase(done: _unitSelectWait,
+                                         cancel: _weaponSelect); 
     }
 }

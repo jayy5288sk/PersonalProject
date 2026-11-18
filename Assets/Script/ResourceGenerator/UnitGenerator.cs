@@ -9,8 +9,10 @@ public class UnitGenerator : MonoBehaviour
     private const float UNIT_SPAWN_Y_POSITION = 1f; // 임시 상수. 유닛 배치 시 높이.
     
     [SerializeField] private UnitDataLoader _unitDataLoader;
+    [SerializeField] private WeaponDataLoader _weaponDataLoader;
 
     private Dictionary<Vector2Int, MapUnit> _unitsBySection = new();
+    private List<WeaponData> _weapons = new();
     public IReadOnlyDictionary<Vector2Int, MapUnit> UnitsBySection => _unitsBySection;
     private int _mapRowCount;
 
@@ -61,6 +63,11 @@ public class UnitGenerator : MonoBehaviour
                 
                 MapUnit tempUnit = mapSpawnUnit.AddComponent<MapUnit>();
                 tempUnit.SetUnitData(unitData, unitSpawnPos);
+                
+                _weapons.Clear();
+                AddWeaponById(unitData.BasicWeapon, _weapons);
+                AddWeaponById(unitData.ExpandedWeapon, _weapons);
+                tempUnit.InitBattleStatus(_weapons);
                 _unitsBySection.Add(unitSpawnPos, tempUnit);
             }
         }
@@ -114,5 +121,19 @@ public class UnitGenerator : MonoBehaviour
         _unitsBySection.Add(section, mapUnit);
         mapUnit.SetUnitData(mapUnit.SelectUnitData, section);
         mapUnit.transform.position = SectionToUnitPosition(section);
+    }
+
+    private void AddWeaponById(int weaponId, List<WeaponData> result)
+    {
+        bool isWeaponExist = _weaponDataLoader.TryGetWeaponById(weaponId, out WeaponData weapon);
+        
+        if(isWeaponExist)
+        {
+            result.Add(weapon);
+        }
+        else
+        {
+            Debug.LogError($"ID {weaponId}번 무장 검색 실패");
+        }
     }
 }

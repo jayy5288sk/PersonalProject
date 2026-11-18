@@ -20,4 +20,9 @@ public abstract class StateBase
     {
         return null;
     }
+
+    public virtual StateBase SelectWeapon(int weaponIndex)
+    {
+        return null;
+    }
 }

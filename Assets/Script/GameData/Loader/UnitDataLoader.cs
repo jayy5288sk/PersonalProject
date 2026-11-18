@@ -119,7 +119,9 @@ public class UnitDataLoader : MonoBehaviour
         if(!int.TryParse(values[0], out int id) ||
            !int.TryParse(values[2], out int hp) ||
            !int.TryParse(values[3], out int en) ||
-           !int.TryParse(values[4], out int movePoints))
+           !int.TryParse(values[4], out int movePoints) ||
+           !int.TryParse(values[5], out int basicWeapon) ||
+           !int.TryParse(values[6], out int expandedWeapon))
         {
             Debug.Log("숫자 변환에 실패했다");
             return null;
@@ -133,8 +135,8 @@ public class UnitDataLoader : MonoBehaviour
             ["hp"] = hp,
             ["en"] = en,
             ["movePoints"] = movePoints,
-            ["basicWeapon"] = values[5],
-            ["expandedWeapon"] = values[6],
+            ["basicWeapon"] = basicWeapon,
+            ["expandedWeapon"] = expandedWeapon,
             ["teamSide"] = values[7]
         };
     }
@@ -158,8 +160,8 @@ public class UnitDataLoader : MonoBehaviour
                     jsonObject.Value<int>("hp"),
                     jsonObject.Value<int>("en"),
                     jsonObject.Value<int>("movePoints"),
-                    jsonObject.Value<string>("basicWeapon"),
-                    jsonObject.Value<string>("expandedWeapon"),
+                    jsonObject.Value<int>("basicWeapon"),
+                    jsonObject.Value<int>("expandedWeapon"),
                     jsonObject.Value<string>("teamSide")
                 );
             }

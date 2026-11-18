@@ -127,19 +127,23 @@ flowchart LR
     Done -->|구독| Phase
 ```
 
-## 유닛·무기 연결 (미구현, P1 11/14)
+## 유닛·무기 연결 (F-01)
 
 ```mermaid
 flowchart LR
-    Head["<b>HeadDataLoader</b><br/>두 로드 완료"]
-    Linker["<b>유닛·무기 중계 컴포넌트</b>"]
-    WeaponLoader["<b>WeaponDataLoader</b><br/>무기 ID로 조회"]
-    UnitSO["<b>UnitData (SO)</b><br/>현재 무장: 무기 이름(string)"]
+    Gen["<b>UnitGenerator</b><br/>PlacementUnit()<br/>유닛 1개 스폰 직후"]
+    UnitSO["<b>UnitData (SO)</b><br/>BasicWeapon · ExpandedWeapon<br/>(무장 ID, int)"]
+    Add["AddWeaponById(ID)<br/>재사용 리스트 _weapons에 추가"]
+    WeaponLoader["<b>WeaponDataLoader</b><br/>TryGetWeaponById()<br/>ID → WeaponData 사전"]
+    Err["에러 로그 후<br/>그 무장만 건너뜀"]
+    MU["<b>MapUnit</b><br/>InitBattleStatus(무장 목록)<br/>WeaponDataList 채우기<br/>CurrentHp · CurrentEn = 최댓값"]
 
-    Head -.->|연결 실행| Linker
-    Linker -.->|1. 무기 ID 전달| WeaponLoader
-    WeaponLoader -.->|2. WeaponData 반환| Linker
-    Linker -.->|3. WeaponData 참조 설정| UnitSO
+    Gen -->|무장 ID 2개 읽기| UnitSO
+    Gen --> Add
+    Add --> WeaponLoader
+    WeaponLoader -->|찾음| Add
+    WeaponLoader -->|못 찾음| Err
+    Add -->|기본·확장 두 번 후| MU
 ```
 
 ## 맵 입력·카메라 준비 (F-02, F-03)
@@ -194,27 +198,31 @@ flowchart TB
         direction LR
         Tile["<b>TileSelector</b><br/>칸 클릭"]
         HUD["<b>CommandMenuHUD</b><br/>이동·공격·대기 버튼<br/>턴 종료 버튼"]
+        WHUD["<b>WeaponListHUD</b><br/>무장 버튼 2개 (기본·확장)<br/>EN 부족 시 비활성"]
     end
 
     Phase["<b>PhaseManager</b><br/>현재 페이즈 1개<br/>ChangePhase() · RequestTurnEnd()"]
-    SM["<b>StateManager</b><br/>현재 상태 1개 · StateContext 1개<br/>ChangeNextState() · 입력 잠금"]
-    Ctx["<b>StateContext</b><br/>SelectedUnit · IsUnitMoved"]
+    SM["<b>StateManager</b><br/>현재 상태 1개 · StateContext 1개<br/>ChangeNextState() · 입력 잠금<br/>SelectedUnitWeapon · CanSelectedUnitUseWeapon()"]
+    Ctx["<b>StateContext</b><br/>SelectedUnit · IsUnitMoved<br/>SelectedWeapon"]
 
     subgraph Show["표시"]
         direction LR
         Disp["<b>UnitSelectDisplay</b><br/>바닥 테두리 + 머리 위 마커"]
-        MU["<b>MapUnit</b><br/>행동 완료 · 어둡게"]
+        MU["<b>MapUnit</b><br/>행동 완료 · 어둡게<br/>HP · EN"]
         Range["<b>MoveRangeDisplay</b><br/>이동 범위 숫자"]
+        ARange["<b>AttackRangeDisplay</b><br/>공격 범위 빨간 칸"]
     end
 
     Tile -->|SectionClicked| SM
     HUD -->|ButtonInputReceiver CommandType| SM
+    WHUD -->|WeaponInputReceiver 무장 번호| SM
     HUD -->|RequestTurnEnd| Phase
     SM --- Ctx
     SM -->|상태 들어가기·나가기| Show
     Phase -->|ResetControlState · SetInputLock| SM
     Phase -->|ResetUnitAction| MU
     SM -.->|OnStateChanged StateType| HUD
+    SM -.->|OnStateChanged StateType| WHUD
     SM -.->|OnStateChanged StateType| Phase
     Phase -.->|OnPhaseChanged PhaseType| HUD
 ```
@@ -230,19 +238,24 @@ flowchart TB
     Wait["<b>UnitSelectWait</b><br/>들어가기: 선택 표시 끄기 · 컨텍스트 비우기"]
     Cmd["<b>CommandSelect</b><br/>들어가기: 현재 위치로 선택 표시 켜기"]
     Move["<b>MoveSectionSelect</b><br/>들어가기: 이동 범위 계산·표시<br/>나가기: 표시 끄기"]
-    Atk["<b>AttackTargetSelect</b><br/>들어가기: 로그"]
+    Weapon["<b>WeaponSelect</b><br/>무장 목록 HUD 표시 (WeaponListHUD)"]
+    Atk["<b>AttackTargetSelect</b><br/>들어가기: 공격 범위 계산·표시<br/>나가기: 표시 끄기"]
 
     Wait -->|"클릭: 행동 가능한 아군<br/>PutUnit"| Cmd
     Cmd -->|"Move (이동 전만)"| Move
-    Cmd -->|Attack| Atk
+    Cmd -->|Attack| Weapon
     Cmd -->|"Wait<br/>CompleteUnitAction"| Wait
     Cmd -->|"맵 클릭 (이동 전)<br/>= 선택 취소"| Wait
     Move -->|"숫자 칸: MoveUnitToSection<br/>AlreadyMovedUnit"| Cmd
     Move -->|"그 외 칸: 취소"| Cmd
-    Atk -->|"아무 칸 클릭<br/>(임시 탈출 경로)"| Cmd
-    Atk -.->|"미구현, F-06"| Fire["무장 선택 · 공격 범위 · 공격"]
+    Weapon -->|"무장 버튼 (EN 충분)<br/>PutWeaponToUnit"| Atk
+    Weapon -->|"맵 클릭: 취소"| Cmd
+    Atk -->|"범위 밖 클릭: 취소"| Weapon
+    Atk -->|"범위 안 적 클릭: 공격<br/>CompleteUnitAction"| Wait
     Reset(["ResetControlState()<br/>아군 페이즈 시작 시"]) --> Wait
 ```
+
+> 무장 버튼이 EN 부족이거나 범위 안 빈 칸·아군 칸을 클릭하면 `null`을 반환해 상태가 바뀌지 않는다.
 
 > 이동 후 커맨드 선택에서는 맵 클릭을 무시하고, `Move`는 HUD(버튼 비활성)와 상태(`IsUnitMoved` 확인) 양쪽에서 막는다.
 
@@ -302,6 +315,68 @@ flowchart LR
     P(["OnPhaseChanged"]) --> TE["턴 종료 버튼<br/>= 아군 페이즈일 때만 활성"]
     Btn["버튼 onClick<br/>(AddListener)"] -->|CommandType| SM["<b>StateManager</b><br/>ButtonInputReceiver()"]
     TBtn["턴 종료 onClick"] --> PM["<b>PhaseManager</b><br/>RequestTurnEnd()"]
+```
+
+### 무장 목록 HUD (WeaponListHUD)
+
+```mermaid
+flowchart LR
+    S(["OnStateChanged"]) --> IsW{"WeaponSelect?"}
+    IsW -->|아니오| Off["패널 끄기"]
+    IsW -->|예| On["패널 켜기<br/>SelectedUnitWeapon 개수만큼 버튼 표시"]
+    On --> En["버튼마다<br/>interactable = CanSelectedUnitUseWeapon(i)<br/>(판정은 MapUnit.CanUseWeapon)"]
+    Btn["기본 / 확장 버튼 onClick<br/>(AddListener)"] -->|"0 / 1"| SM["<b>StateManager</b><br/>WeaponInputReceiver()"]
+```
+
+## 무장 공격 (F-06, F-07, F-24)
+
+### 공격 범위 계산 (AttackRangeCalculator)
+
+```mermaid
+flowchart TB
+    In["GetAttackableSections()<br/>입력: 공격자 칸, 무장, IsInsideMap (Func)"] --> Shape{"RangeShape"}
+    Shape -->|"Single · Area"| Dia["마름모<br/>MinRange ≤ #124;dx#124; + #124;dy#124; ≤ MaxRange"]
+    Shape -->|Pierce| Line["상하좌우 4방향<br/>MinRange ~ MaxRange 칸"]
+    Dia --> Inside{"맵 안?"}
+    Line --> Inside
+    Inside -->|아니오| Skip["제외"]
+    Inside -->|예| Out["고를 수 있는 칸 (HashSet)<br/>지형·유닛은 막지 않음"]
+
+    Click["ApplyAttackSection()<br/>입력: 클릭한 칸, 고를 수 있는 칸"] --> Hit{"RangeShape"}
+    Hit -->|Single| H1["클릭한 칸 1개"]
+    Hit -->|Area| H2["고를 수 있는 칸 전부"]
+    Hit -->|Pierce| H3["클릭한 방향 직선<br/>(고를 수 있는 칸만)"]
+```
+
+> 계산기는 칸 좌표만 다루고 유닛·상태·`MapGenerator`를 모른다. 적 AI(F-08)에서 재사용한다.
+
+### 공격 실행 처리 순서 (AttackTargetSelect.SectionClick)
+
+```mermaid
+flowchart TB
+    Click["칸 클릭"] --> InRange{"고를 수 있는 칸?"}
+    InRange -->|아니오| Cancel["WeaponSelect 반환<br/>(취소)"]
+    InRange -->|예| Hit["ApplyAttackSection()<br/>맞는 칸 구하기"]
+    Hit --> Pick["<b>UnitGenerator</b><br/>TryGetUnitAtSection()<br/>공격자와 다른 진영만 대상"]
+    Pick --> Any{"대상 있음?"}
+    Any -->|아니오| Ignore["null 반환<br/>(무시, 범위 표시 유지)"]
+    Any -->|예| Dmg["대상마다<br/><b>BattleCalculator</b>.CalculateDamage()<br/>→ TakeDamage()"]
+    Dmg --> En["ConsumeEnergy(RequireEn)<br/>공격 1회당 1번"]
+    En --> Done["CompleteUnitAction()"]
+    Done --> Ret["UnitSelectWait 반환"]
+    Ret -.->|OnStateChanged| PM["<b>PhaseManager</b><br/>아군 전원 완료 확인"]
+    Dmg -.->|미구현, F-09| Dead["HP 0 유닛 격파 처리"]
+```
+
+### 공격 범위 표시 (AttackRangeDisplay, 오브젝트 풀)
+
+```mermaid
+flowchart LR
+    Recv["ShowAttackRangeHighlight()<br/>월드 위치 목록"] --> Off["ClearHighlights()<br/>전부 끄기"]
+    Off --> Lack{"보유 개수가<br/>필요 개수보다 적음?"}
+    Lack -->|예| Dup["DuplicateHighlight()<br/>AttackRangeQuad 복제 후 끄기"]
+    Dup --> Lack
+    Lack -->|아니오| On["<b>AttackRangeHighlight</b><br/>ShowAttackRange()<br/>위치 + _prefabHeight"]
 ```
 
 ## 이동 범위 (F-05)

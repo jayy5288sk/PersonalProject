@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic; // TEMP: DebugAttackRange 삭제 시 함께 삭제
 using UnityEngine;
 
 public class HeadDataLoader : MonoBehaviour

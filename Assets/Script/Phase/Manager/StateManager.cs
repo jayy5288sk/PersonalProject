@@ -12,6 +12,7 @@ public class StateManager : MonoBehaviour
     private CommandSelect _commandSelect;
     private MoveSectionSelect _moveSectionSelect;
     private AttackTargetSelect _attackTargetSelect;
+    private WeaponSelect _weaponSelect;
     private StateBase _currentState;
     private readonly StateContext _stateContext = new();
     private bool _isInputLocked; // 적 페이즈 중 플레이어 입력 차단
@@ -57,6 +58,22 @@ public class StateManager : MonoBehaviour
         ChangeNextState(nextState);
     }
 
+    public void WeaponInputReceiver(int weaponIndex)
+    {
+        if (_isInputLocked)
+        {
+            return;
+        }
+
+        StateBase nextState = _currentState.SelectWeapon(weaponIndex);
+        if (nextState == null)
+        {
+            return;
+        }
+
+        ChangeNextState(nextState);
+    }
+
     /// <summary>
     /// 어느 상태에 있든 유닛 선택 대기로 되돌림. 현재 상태의 나가기와 대기 상태의 들어가기가 정리를 맡음
     /// </summary>
@@ -88,12 +105,16 @@ public class StateManager : MonoBehaviour
                                                    _mapGenerator, _unitGenerator,
                                                    _moveRangeDisplay);
         _attackTargetSelect = new AttackTargetSelect(_stateContext);
-
+        _weaponSelect = new WeaponSelect(_stateContext);
+        
         _unitSelectWait.SetStateBase(_commandSelect);
         _commandSelect.SetStateBase(moveState: _moveSectionSelect,
-                                    attackState: _attackTargetSelect,
+                                    attackState: _weaponSelect,
                                     unitSelectState: _unitSelectWait);
+        _weaponSelect.SetStateBase(targetState: _attackTargetSelect,
+                                   cancelState: _commandSelect);
         _moveSectionSelect.SetStateBase(_commandSelect);
-        _attackTargetSelect.SetStateBase(_commandSelect); // 임시 탈출 경로용
+        _attackTargetSelect.SetStateBase(done: _unitSelectWait,
+                                         cancel: _weaponSelect); 
     }
 }

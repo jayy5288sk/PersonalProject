@@ -35,7 +35,8 @@ public class UnitGenerator : MonoBehaviour
         {
             for (int j = 0; j < columnCount; j++)
             {
-                int currentID = spawnArray[i][j].Value<int>(); // 배치될 유닛의 ID
+                JToken spawnCell = spawnArray[i][j];
+                int currentID = spawnCell[UnitSpawnDataLoader.SPAWN_ID_KEY].Value<int>(); // 배치될 유닛의 ID
                 GameObject currentUnit; // 배치될 유닛
                 GameObject mapSpawnUnit; // 정보를 받을 유닛
                 
@@ -63,7 +64,9 @@ public class UnitGenerator : MonoBehaviour
                 
                 MapUnit tempUnit = mapSpawnUnit.AddComponent<MapUnit>();
                 tempUnit.SetUnitData(unitData, unitSpawnPos);
-                
+                tempUnit.SetBehaviorType(
+                    (EnemyBehaviorType)spawnCell[UnitSpawnDataLoader.SPAWN_BEHAVIOR_KEY].Value<int>());
+
                 _weapons.Clear();
                 AddWeaponById(unitData.BasicWeapon, _weapons);
                 AddWeaponById(unitData.ExpandedWeapon, _weapons);
@@ -121,6 +124,15 @@ public class UnitGenerator : MonoBehaviour
         _unitsBySection.Add(section, mapUnit);
         mapUnit.SetUnitData(mapUnit.SelectUnitData, section);
         mapUnit.transform.position = SectionToUnitPosition(section);
+    }
+
+    /// <summary>
+    /// 격파된 유닛을 칸 목록에서 빼고 오브젝트 파괴. 이후 선택·공격 대상에서 제외된다
+    /// </summary>
+    public void RemoveUnit(MapUnit mapUnit)
+    {
+        _unitsBySection.Remove(mapUnit.SectionUnitPos);
+        Destroy(mapUnit.gameObject);
     }
 
     private void AddWeaponById(int weaponId, List<WeaponData> result)

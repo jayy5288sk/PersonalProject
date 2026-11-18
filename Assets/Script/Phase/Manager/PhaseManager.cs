@@ -6,6 +6,7 @@ public class PhaseManager : MonoBehaviour
 {
     [SerializeField] private StateManager _stateManager;
     [SerializeField] private UnitGenerator _unitGenerator;
+    [SerializeField] private EnemyAIController _enemyAIController;
 
     private AllyPhase _allyPhase;
     private EnemyPhase _enemyPhase;
@@ -37,12 +38,25 @@ public class PhaseManager : MonoBehaviour
     {
         _unitGenerator.OnUnitPlacementCompleted += HandleUnitPlacementCompleted;
         _stateManager.OnStateChanged += HandleStateChanged;
+        _enemyAIController.OnEnemyTurnCompleted += HandleEnemyTurnCompleted;
     }
 
     private void UnbindEvents()
     {
         _unitGenerator.OnUnitPlacementCompleted -= HandleUnitPlacementCompleted;
         _stateManager.OnStateChanged -= HandleStateChanged;
+        _enemyAIController.OnEnemyTurnCompleted -= HandleEnemyTurnCompleted;
+    }
+
+    // 적 전원 행동 완료 시 아군 페이즈로 복귀
+    private void HandleEnemyTurnCompleted()
+    {
+        if (_currentPhase != _enemyPhase)
+        {
+            return;
+        }
+
+        ChangePhase(_allyPhase);
     }
 
     // 유닛 배치가 끝나야 아군 목록이 채워지므로, 첫 아군 페이즈는 배치 완료 시점에 시작
@@ -101,8 +115,6 @@ public class PhaseManager : MonoBehaviour
     private void Init()
     {
         _allyPhase = new AllyPhase(_unitGenerator, _stateManager);
-        _enemyPhase = new EnemyPhase(_stateManager);
-
-        _enemyPhase.SetPhaseBase(_allyPhase);
+        _enemyPhase = new EnemyPhase(_stateManager, _enemyAIController);
     }
 }

@@ -123,7 +123,8 @@ public class StateManager : MonoBehaviour
                                                    _moveRangeDisplay);
         _attackTargetSelect = new AttackTargetSelect(_stateContext, 
                                                      attackCalculator,
-                                                     _mapGenerator, 
+                                                     _mapGenerator,
+                                                     _unitGenerator,
                                                      _attackRangeDisplay);
         _weaponSelect = new WeaponSelect(_stateContext);
         

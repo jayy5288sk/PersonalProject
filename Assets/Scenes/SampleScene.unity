@@ -366,6 +366,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 866b5e3db80ee18469f89ee2f523fbf3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapGenerator
+--- !u!114 &743434436 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1937212587853195743, guid: 9aaee2b8e86215747a6fd1654aa99aaa, type: 3}
+  m_PrefabInstance: {fileID: 2913626579283294008}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f202697d7bc4a8444adc0d6f084a012a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDataLoader
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -652,6 +663,10 @@ PrefabInstance:
       propertyPath: _unitDataLoader
       value: 
       objectReference: {fileID: 1643269308}
+    - target: {fileID: 2873000125386339714, guid: d17199b9aa2c74340a0cc375c8f0a79f, type: 3}
+      propertyPath: _weaponDataLoader
+      value: 
+      objectReference: {fileID: 743434436}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

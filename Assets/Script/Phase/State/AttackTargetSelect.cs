@@ -45,7 +45,12 @@ public class AttackTargetSelect : StateBase
                                                      _mapGenerator.IsInsideMap,
                                                      _attackSections);
         _highlightPosition.Clear();
-        //_attackSections
+        foreach (Vector2Int section in _attackSections)
+        {
+            _highlightPosition.Add(_mapGenerator.ReturnTerrainPosition(section));
+        }
+        
+        _attackRangeDisplay.ShowAttackRangeHighlight(_highlightPosition);
     }
 
     public override void StateExit()

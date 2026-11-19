@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 공격 실행 공용 처리. 아군 공격(AttackTargetSelect)과 적 AI(EnemyAIController)가 같은 규칙을 쓴다
+/// 공격 실행 공용 처리.
+/// 즉, 아군 공격(AttackTargetSelect)과 적 AI(EnemyAIController)가 같은 규칙을 쓴다
 /// </summary>
 public static class AttackExecutor
 {
@@ -26,7 +27,8 @@ public static class AttackExecutor
     /// <summary>
     /// 대상마다 데미지 적용 → HP 0이면 제거, 마지막에 EN 1회 소모
     /// </summary>
-    public static void Execute(MapUnit attacker, WeaponData weapon, List<MapUnit> targets,
+    public static void Execute(MapUnit attacker, WeaponData weapon, 
+                               List<MapUnit> targets,
                                UnitGenerator unitGenerator)
     {
         foreach (MapUnit target in targets)

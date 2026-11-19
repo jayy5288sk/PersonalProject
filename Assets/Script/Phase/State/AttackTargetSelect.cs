@@ -76,11 +76,13 @@ public class AttackTargetSelect : StateBase
         WeaponData weapon = _stateContext.SelectedWeapon;
 
         // 맞는 칸을 구하고, 그 칸에 있는 공격자와 다른 진영의 유닛만 모은다
-        _attackRangeCalculator.ApplyAttackSection(attacker.SectionUnitPos, weapon, section,
+        _attackRangeCalculator.ApplyAttackSection(attacker.SectionUnitPos, 
+                                                  weapon, section, 
                                                   _attackSections, _hitSections);
-        AttackExecutor.CollectTargets(attacker, _hitSections, _unitGenerator, _targets);
+        AttackExecutor.CollectTargets(attacker, _hitSections, _unitGenerator, 
+                                      _targets);
 
-        // 범위 안이지만 맞을 적이 없음(빈 칸, 아군 칸) → 무시
+        // 범위 안이지만 맞을 적이 없을 때(빈 칸, 아군 칸) '무시'
         if (_targets.Count == 0)
         {
             return null;
@@ -88,6 +90,7 @@ public class AttackTargetSelect : StateBase
 
         AttackExecutor.Execute(attacker, weapon, _targets, _unitGenerator);
 
+        // 행동 완료 및 유닛 선택 대기
         attacker.CompleteUnitAction();
         return _doneState;
     }

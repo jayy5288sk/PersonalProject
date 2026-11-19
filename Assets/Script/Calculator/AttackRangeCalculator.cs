@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AttackRangeCalculator
 {
-    // Pierce 용도. MovementRangeCalculator 참고.
+    // Pierce 용도. MovementRangeCalculator를 참고함.
     private static readonly Vector2Int[] DIRECTIONS =
     {
         Vector2Int.up,
@@ -13,6 +13,13 @@ public class AttackRangeCalculator
         Vector2Int.right
     };
     
+    /// <summary>
+    /// 무기 사거리 범위 측정 함수
+    /// </summary>
+    /// <param name="center">공격자 좌표</param>
+    /// <param name="weapon">사용 무기 정보</param>
+    /// <param name="isInsideMap">in: 해당 칸 → out: 맵에 있는가 T/F</param>
+    /// <param name="result">적합 좌표 결과(들)</param>
     public void GetAttackableSections(Vector2Int center, WeaponData weapon,
                                       Func<Vector2Int, bool> isInsideMap, // 칸을 주면 T/F
                                       HashSet<Vector2Int> result) // result에 담음 
@@ -76,6 +83,14 @@ public class AttackRangeCalculator
         }
     }
 
+    /// <summary>
+    /// 무기 범위 내 데미지 적용 함수
+    /// </summary>
+    /// <param name="center">공격자 좌표</param>
+    /// <param name="weapon">사용 무기 정보</param>
+    /// <param name="clicked">지정한 좌표</param>
+    /// <param name="attackable">무기 사거리 범위</param>
+    /// <param name="result">실질 적용 좌표(들)</param>
     public void ApplyAttackSection(Vector2Int center, WeaponData weapon,
                                    Vector2Int clicked, HashSet<Vector2Int> attackable,
                                    List<Vector2Int> result)

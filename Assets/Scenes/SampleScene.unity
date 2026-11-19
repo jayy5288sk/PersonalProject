@@ -1381,6 +1381,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1670166387}
     - target: {fileID: 6501987873968822186, guid: fecb6a46476dfa745af746d12ddb2421, type: 3}
+      propertyPath: _battleResultJudge
+      value: 
+      objectReference: {fileID: 1274004431}
+    - target: {fileID: 6501987873968822186, guid: fecb6a46476dfa745af746d12ddb2421, type: 3}
       propertyPath: _enemyAIController
       value: 
       objectReference: {fileID: 1944230153}

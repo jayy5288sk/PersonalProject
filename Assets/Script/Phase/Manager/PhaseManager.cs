@@ -7,6 +7,7 @@ public class PhaseManager : MonoBehaviour
     [SerializeField] private StateManager _stateManager;
     [SerializeField] private UnitGenerator _unitGenerator;
     [SerializeField] private EnemyAIController _enemyAIController;
+    [SerializeField] private BattleResultJudge _battleResultJudge;
 
     private AllyPhase _allyPhase;
     private EnemyPhase _enemyPhase;

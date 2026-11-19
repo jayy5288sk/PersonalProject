@@ -64,23 +64,35 @@ public class AttackTargetSelect : StateBase
         _attackSections.Clear();
     }
 
-    public override StateBase SectionClick(Vector2Int section)
+    /// <summary>
+    /// 범위 밖이면 false. 범위 안이면 맞을 적(공격자와 다른 진영)을 result에 채우고 true.
+    /// 실제 공격과 예상 전투 결과가 같은 대상 규칙을 쓰도록 한 곳에 둔다
+    /// </summary>
+    public bool TryCollectTargetsAt(Vector2Int section, List<MapUnit> result)
     {
-        // 범위 밖 클릭 시, 무장 다시 고르기
+        result.Clear();
         if (!_attackSections.Contains(section))
         {
-            return _cancelState;
+            return false;
         }
 
         MapUnit attacker = _stateContext.SelectedUnit;
-        WeaponData weapon = _stateContext.SelectedWeapon;
 
         // 맞는 칸을 구하고, 그 칸에 있는 공격자와 다른 진영의 유닛만 모은다
-        _attackRangeCalculator.ApplyAttackSection(attacker.SectionUnitPos, 
-                                                  weapon, section, 
+        _attackRangeCalculator.ApplyAttackSection(attacker.SectionUnitPos,
+                                                  _stateContext.SelectedWeapon, section,
                                                   _attackSections, _hitSections);
-        AttackExecutor.CollectTargets(attacker, _hitSections, _unitGenerator, 
-                                      _targets);
+        AttackExecutor.CollectTargets(attacker, _hitSections, _unitGenerator, result);
+        return true;
+    }
+
+    public override StateBase SectionClick(Vector2Int section)
+    {
+        // 범위 밖 클릭 시, 무장 다시 고르기
+        if (!TryCollectTargetsAt(section, _targets))
+        {
+            return _cancelState;
+        }
 
         // 범위 안이지만 맞을 적이 없을 때(빈 칸, 아군 칸) '무시'
         if (_targets.Count == 0)
@@ -88,7 +100,8 @@ public class AttackTargetSelect : StateBase
             return null;
         }
 
-        AttackExecutor.Execute(attacker, weapon, _targets, _unitGenerator);
+        MapUnit attacker = _stateContext.SelectedUnit;
+        AttackExecutor.Execute(attacker, _stateContext.SelectedWeapon, _targets, _unitGenerator);
 
         // 행동 완료 및 유닛 선택 대기
         attacker.CompleteUnitAction();

@@ -26,9 +26,12 @@ public class AllyPhase : PhaseBase
         {
             unit.ResetUnitAction();
         }
-
-        // 선택 중 턴이 끝났어도 표시·메뉴가 남지 않도록 조작 단계 초기화
-        _stateManager.ResetControlState();
         return null;
+    }
+
+    // 선택 중 턴 종료 시 적 턴 동안 표시·메뉴가 남지 않도록 나갈 때 조작 단계 초기화
+    public override void PhaseExit()
+    {
+        _stateManager.ResetControlState();
     }
 }

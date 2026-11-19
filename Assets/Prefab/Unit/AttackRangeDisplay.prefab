@@ -44,5 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1652e944ccb938a4ea4863e57831a422, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AttackRangeDisplay
-  _attackRangePrefab: {fileID: 1286378997884836432, guid: 5ea3b2d95381f644f9ca08053d519c76, type: 3}
+  _attackRangePrefab: {fileID: -6162879211616323382, guid: 208fa713de854304e868736cacb365de, type: 3}
   _prefabHeight: 0.02

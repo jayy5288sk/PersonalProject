@@ -26,6 +26,8 @@ public class StateManager : MonoBehaviour
 
     // HUD 버튼 활성화용. 컨텍스트 자체는 공개하지 않고 필요한 값만 읽기 전용으로 공개
     public bool IsSelectedUnitMoved => _stateContext.IsUnitMoved;
+    public MapUnit SelectedUnit => _stateContext.SelectedUnit;          // 예상 전투 결과용
+    public WeaponData SelectedWeapon => _stateContext.SelectedWeapon;   // 예상 전투 결과용
 
     private void Awake() => Init();
 
@@ -81,9 +83,15 @@ public class StateManager : MonoBehaviour
 
     /// <summary>
     /// 어느 상태에 있든 유닛 선택 대기로 되돌림. 현재 상태의 나가기와 대기 상태의 들어가기가 정리를 맡음
+    /// 이미 대기 상태면 정리할 것이 없으므로 상태 변경 이벤트를 다시 보내지 않음 (페이즈 전환 중복 방지)
     /// </summary>
     public void ResetControlState()
     {
+        if (_currentState == _unitSelectWait)
+        {
+            return;
+        }
+
         ChangeNextState(_unitSelectWait);
     }
 
@@ -110,6 +118,20 @@ public class StateManager : MonoBehaviour
         }
 
         return unit.CanUseWeapon(unit.WeaponDataList[weaponIndex]);
+    }
+
+    /// <summary>
+    /// 공격 대상 선택 상태일 때만 그 칸을 공격하면 맞을 적을 result에 채움. 그 외 상태면 false
+    /// </summary>
+    public bool TryGetForecastTargets(Vector2Int section, List<MapUnit> result)
+    {
+        if (_currentState != _attackTargetSelect)
+        {
+            result.Clear();
+            return false;
+        }
+
+        return _attackTargetSelect.TryCollectTargetsAt(section, result);
     }
 
     private void Init()

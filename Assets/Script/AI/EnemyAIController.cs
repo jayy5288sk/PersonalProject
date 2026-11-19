@@ -35,6 +35,11 @@ public class EnemyAIController : MonoBehaviour
         StartCoroutine(EnemyTurnRoutine());
     }
 
+    public void StopEnemyTurn()
+    {
+        StopAllCoroutines();
+    }
+
     private IEnumerator EnemyTurnRoutine()
     {
         // 이동하면 칸 목록이 바뀌므로 목록을 먼저 복사해 두고 순회

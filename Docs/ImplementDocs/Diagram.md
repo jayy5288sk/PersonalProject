@@ -174,7 +174,11 @@ flowchart LR
     D -->|안| E{"이전 칸과 같음?"}
     E -->|같음| F["갱신 없음"]
     E -->|다름| G["현재 칸 저장<br/>ReturnTerrainPosition() + 띄우는 높이<br/>하이라이트 이동·표시"]
+    G --> Evt(["OnPointedSectionChanged<br/>(새 칸)"])
+    H -->|맵 밖이 된 순간| Evt2(["OnPointedSectionChanged<br/>(-1, -1)"])
 ```
+
+> 두 이벤트는 칸이 바뀔 때만 나간다. 호버 정보창·예상 전투 결과(F-10)가 구독한다.
 
 ### 클릭 처리 (TileSelector, F-04)
 
@@ -252,7 +256,7 @@ flowchart TB
     Weapon -->|"맵 클릭: 취소"| Cmd
     Atk -->|"범위 밖 클릭: 취소"| Weapon
     Atk -->|"범위 안 적 클릭: 공격<br/>CompleteUnitAction"| Wait
-    Reset(["ResetControlState()<br/>아군 페이즈 시작 시"]) --> Wait
+    Reset(["ResetControlState()<br/>아군 페이즈 나갈 때<br/>(이미 대기면 생략)"]) --> Wait
 ```
 
 > 무장 버튼이 EN 부족이거나 범위 안 빈 칸·아군 칸을 클릭하면 `null`을 반환해 상태가 바뀌지 않는다.
@@ -279,7 +283,7 @@ flowchart LR
 ```mermaid
 flowchart TB
     Placed(["OnUnitPlacementCompleted"]) --> Ally
-    Ally["<b>AllyPhase</b><br/>들어가기: 모든 아군 ResetUnitAction<br/>StateManager.ResetControlState()<br/>→ null (머무름)"]
+    Ally["<b>AllyPhase</b><br/>들어가기: TurnCount + 1 (PhaseManager)<br/>모든 아군 ResetUnitAction<br/>→ null (머무름)<br/>나가기: StateManager.ResetControlState()"]
     Enemy["<b>EnemyPhase</b><br/>들어가기: SetInputLock(true)<br/>EnemyAIController.StartEnemyTurn()<br/>→ null (머무름)<br/>나가기: SetInputLock(false)"]
     AI["<b>EnemyAIController</b><br/>적 턴 코루틴<br/>→ 적 AI (F-08) 참고"]
     Done(["OnEnemyTurnCompleted<br/>적 페이즈일 때만"])
@@ -291,7 +295,10 @@ flowchart TB
     Enemy --> AI
     AI -.-> Done
     Done --> Ally
+    Over(["OnBattleResult 수신 후<br/>_isGameOver = true"]) -.-> Block["이후 모든 전환 차단<br/>(Check · Turn · Done)"]
 ```
+
+> 결과가 나면 `RequestTurnEnd`, `HandleEnemyTurnCompleted`, `HandleStateChanged`가 맨 앞 가드에서 돌아가 더 이상 전환하지 않는다. → 승패 판정 (F-09) 참고
 
 ### 페이즈 전환 처리 순서 (ChangePhase)
 
@@ -301,12 +308,17 @@ flowchart LR
     Loop -->|아니오| End["종료"]
     Loop -->|예| Exit["현재 페이즈<br/>PhaseExit()"]
     Exit --> Swap["현재 페이즈 교체"]
-    Swap --> Enter["다음 페이즈 = PhaseEnter()<br/>(머무르면 null)"]
+    Swap --> Turn{"아군 페이즈?"}
+    Turn -->|예| Count["TurnCount + 1"]
+    Turn -->|아니오| Enter
+    Count --> Enter["다음 페이즈 = PhaseEnter()<br/>(머무르면 null)"]
     Enter --> Evt(["OnPhaseChanged<br/>(PhaseType)"])
     Evt --> Loop
 ```
 
 > 들어가기 안에서 직접 전환하지 않고 다음 페이즈를 반환하므로, 이벤트가 항상 `Enemy` → `Ally` 순서로 나간다.
+
+> `TurnCount`는 이벤트보다 먼저 올라가므로, 이벤트를 받은 HUD가 새 턴 번호를 읽는다.
 
 ### 커맨드 메뉴 HUD (CommandMenuHUD)
 
@@ -324,12 +336,17 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    S(["OnStateChanged"]) --> IsW{"WeaponSelect?"}
+    S(["OnStateChanged"]) --> Info0["무장 정보창 끄기<br/>(항상)"]
+    Info0 --> IsW{"WeaponSelect?"}
     IsW -->|아니오| Off["패널 끄기"]
-    IsW -->|예| On["패널 켜기<br/>SelectedUnitWeapon 개수만큼 버튼 표시"]
+    IsW -->|예| On["패널 켜기<br/>SelectedUnitWeapon 개수만큼 버튼 표시<br/>버튼 텍스트 = WeaponName"]
     On --> En["버튼마다<br/>interactable = CanSelectedUnitUseWeapon(i)<br/>(판정은 MapUnit.CanUseWeapon)"]
     Btn["기본 / 확장 버튼 onClick<br/>(AddListener)"] -->|"0 / 1"| SM["<b>StateManager</b><br/>WeaponInputReceiver()"]
+    Hover["<b>WeaponDataHover</b> (버튼마다)<br/>OnPointerEnter / Exit"] -.->|"OnHoverEnter(무장 순번)"| InfoOn["정보창 켜기<br/>이름 · 사거리 · 공격력 · EN · 범위 모양"]
+    Hover -.->|OnHoverExit| InfoOff["정보창 끄기"]
 ```
+
+> 무장 정보창은 Raycast를 받지 않는다. 받으면 버튼을 덮어 진입·이탈이 반복되며 깜빡인다. 비활성 버튼도 호버는 받는다.
 
 ## 무장 공격 (F-06, F-07, F-24)
 
@@ -357,11 +374,15 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    Click["칸 클릭"] --> InRange{"고를 수 있는 칸?"}
-    InRange -->|아니오| Cancel["WeaponSelect 반환<br/>(취소)"]
-    InRange -->|예| Hit["ApplyAttackSection()<br/>맞는 칸 구하기"]
-    Hit --> Pick["<b>AttackExecutor</b><br/>CollectTargets()<br/>공격자와 다른 진영만 대상"]
-    Pick --> Any{"대상 있음?"}
+    Click["칸 클릭"] --> Try
+    subgraph Try["TryCollectTargetsAt(칸, result) · 예상 전투 결과와 공용"]
+        direction TB
+        InRange{"고를 수 있는 칸?"}
+        InRange -->|예| Hit["ApplyAttackSection()<br/>맞는 칸 구하기"]
+        Hit --> Pick["<b>AttackExecutor</b><br/>CollectTargets()<br/>공격자와 다른 진영만 대상"]
+    end
+    InRange -->|"아니오 (false)"| Cancel["WeaponSelect 반환<br/>(취소)"]
+    Pick -->|true| Any{"대상 있음?"}
     Any -->|아니오| Ignore["null 반환<br/>(무시, 범위 표시 유지)"]
     Any -->|예| Exec["<b>AttackExecutor</b><br/>Execute()<br/>→ 공격 실행 공용 처리 참고"]
     Exec --> Done["CompleteUnitAction()"]
@@ -376,13 +397,13 @@ flowchart LR
     In["Execute()<br/>공격자, 무장, 대상 목록"] --> Loop{"남은 대상?"}
     Loop -->|예| Dmg["<b>BattleCalculator</b><br/>CalculateDamage()<br/>→ TakeDamage()"]
     Dmg --> Dead{"IsDefeated?"}
-    Dead -->|예| Rm["<b>UnitGenerator</b><br/>RemoveUnit()<br/>사전에서 제거 · Destroy"]
+    Dead -->|예| Rm["<b>UnitGenerator</b><br/>RemoveUnit()<br/>사전에서 제거 → OnUnitDeath → Destroy"]
     Dead -->|아니오| Loop
     Rm --> Loop
     Loop -->|아니오| En["ConsumeEnergy(RequireEn)<br/>공격 1회당 1번"]
 ```
 
-> 아군(`AttackTargetSelect`)과 적(`EnemyAIController`)이 같은 처리를 쓴다.
+> 아군(`AttackTargetSelect`)과 적(`EnemyAIController`)이 같은 처리를 쓴다. `OnUnitDeath`는 승패 판정 (F-09)이 구독한다.
 
 ## 적 AI (F-08)
 
@@ -427,6 +448,97 @@ flowchart LR
     Dup --> Lack
     Lack -->|아니오| On["<b>AttackRangeHighlight</b><br/>ShowAttackRange()<br/>위치 + _prefabHeight"]
 ```
+
+## 승패 판정·결과 (F-09, F-11)
+
+### 판정과 진행 중단
+
+```mermaid
+flowchart TB
+    Exec["<b>AttackExecutor</b><br/>Execute() 격파<br/>(아군 공격 · 적 AI 공통)"] --> Rm["<b>UnitGenerator</b><br/>RemoveUnit()<br/>사전에서 제거 → 이벤트 → Destroy"]
+    Rm -.->|"OnUnitDeath(MapUnit)"| Judge
+
+    subgraph Judge["BattleResultJudge"]
+        direction TB
+        Ended{"_isGameOver?"}
+        Ended -->|아니오| Cnt["진영별 집계<br/>ENEMY → EnemyKillCount + 1<br/>ALLY → AllyDeathCount + 1"]
+        Cnt --> E0{"남은 적 0명?"}
+        E0 -->|예| Win["EndBattle(Victory)"]
+        E0 -->|아니오| A0{"남은 아군 0명?"}
+        A0 -->|예| Lose["EndBattle(Defeat)"]
+    end
+    Ended -->|예| Ignore["무시"]
+    A0 -->|아니오| Ignore
+
+    Win --> Evt(["_isGameOver = true<br/>OnBattleResult(BattleResult)"])
+    Lose --> Evt
+    Evt -.->|구독| PM["<b>PhaseManager</b><br/>SetBattleResult()<br/>_isGameOver = true<br/>SetInputLock(true)<br/>EnemyAIController.StopEnemyTurn()"]
+    Evt -.->|구독| HUD["<b>BattleResultHUD</b><br/>결과 패널 표시"]
+```
+
+> 범위 무장으로 여러 기를 한 번에 격파해도 이벤트는 기체마다 오고, 결과는 마지막 1기에서 한 번만 난다.
+
+### 결과 패널 (BattleResultHUD)
+
+```mermaid
+flowchart LR
+    R(["OnBattleResult"]) --> On["_resultPanel 켜기"]
+    On --> Title["제목<br/>Victory → Stage Clear<br/>Defeat → Defeated"]
+    On --> Stat["Turn = PhaseManager.TurnCount<br/>격파 = EnemyKillCount<br/>손실 = AllyDeathCount"]
+    On --> Next["다음 스테이지 버튼<br/>승리 시에만 표시"]
+    Retry["재도전 onClick"] --> Load["SceneManager.LoadScene<br/>(현재 씬 buildIndex)"]
+    Menu["다음 스테이지 · 메인 메뉴 onClick"] -.->|미구현, 11/20| Later["스테이지 선택 · 메인 메뉴"]
+```
+
+> HUD 스크립트는 항상 켜진 오브젝트에 두고 `_resultPanel`만 끄고 켠다. 꺼진 오브젝트에 두면 `OnEnable`이 불리지 않아 구독하지 못한다.
+
+## 인게임 UI (F-10, F-07)
+
+### 구독 구조
+
+```mermaid
+flowchart LR
+    PM["<b>PhaseManager</b>"] -.->|"OnPhaseChanged"| TP["<b>TurnPhaseHUD</b><br/>Turn N · Ally/Enemy Phase"]
+    PM -.->|"OnPhaseChanged"| HI
+    TS["<b>TileSelector</b>"] -.->|"OnPointedSectionChanged"| HI["<b>HoverInfoHUD</b><br/>지형 · 유닛 · HP · EN"]
+    TS -.->|"OnPointedSectionChanged"| BF["<b>BattleForecastHUD</b><br/>예상 전투 결과"]
+    SM["<b>StateManager</b>"] -.->|"OnStateChanged"| HI
+    SM -.->|"OnStateChanged"| BF
+    BF -->|"TryGetForecastTargets()<br/>SelectedUnit · SelectedWeapon"| SM
+    HI -->|"TerrainBySection"| MG["<b>MapGenerator</b>"]
+    HI -->|"TryGetUnitAtSection()"| UG["<b>UnitGenerator</b>"]
+```
+
+> 칸 변경 외에 상태·페이즈 변경 때도 마지막 칸으로 다시 그려, 같은 칸에 마우스를 둔 채 공격·이동이 끝나도 최신 값을 보인다.
+
+### 호버 정보창 (HoverInfoHUD.Refresh)
+
+```mermaid
+flowchart LR
+    In["마지막 칸"] --> Out{"(-1, -1) 또는<br/>지형 사전에 없음?"}
+    Out -->|예| Off["패널 끄기"]
+    Out -->|아니오| Ter["지형 줄<br/>TileName + MOVE RequireMove<br/>(진입 불가면 Impassable)"]
+    Ter --> U{"TryGetUnitAtSection?"}
+    U -->|예| Unit["유닛 줄 추가<br/>UnitName [TeamSide]<br/>HP 현재/최대 · EN 현재/최대"]
+    U -->|아니오| Show["패널 켜기"]
+    Unit --> Show
+```
+
+### 예상 전투 결과 (BattleForecastHUD.Refresh)
+
+```mermaid
+flowchart LR
+    In["마지막 칸"] --> Ask["<b>StateManager</b><br/>TryGetForecastTargets()"]
+    Ask --> St{"AttackTargetSelect<br/>상태?"}
+    St -->|아니오| Off["패널 끄기"]
+    St -->|예| Col["<b>AttackTargetSelect</b><br/>TryCollectTargetsAt()<br/>(실제 공격과 같은 코드)"]
+    Col --> Any{"범위 안 · 대상 있음?"}
+    Any -->|아니오| Off
+    Any -->|예| Line["대상마다<br/><b>BattleCalculator</b>.CalculateDamage()<br/>이름 HP 현재 → 이후 (-데미지)<br/>이후 0이면 DEFEAT"]
+    Line --> On["패널 켜기"]
+```
+
+> 맵 위 정보창들은 Raycast를 받지 않는다. 받으면 `TileSelector`가 UI 위로 판단해 칸 클릭이 무시된다.
 
 ## 이동 범위 (F-05)
 

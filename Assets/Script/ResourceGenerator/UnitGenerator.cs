@@ -17,6 +17,7 @@ public class UnitGenerator : MonoBehaviour
     private int _mapRowCount;
 
     public event Action OnUnitPlacementCompleted;
+    public event Action<MapUnit> OnUnitDeath;
 
     public void PlacementUnit(JArray spawnArray, int unitSpawnArrayRow)
     {
@@ -132,6 +133,7 @@ public class UnitGenerator : MonoBehaviour
     public void RemoveUnit(MapUnit mapUnit)
     {
         _unitsBySection.Remove(mapUnit.SectionUnitPos);
+        OnUnitDeath?.Invoke(mapUnit);
         Destroy(mapUnit.gameObject);
     }
 

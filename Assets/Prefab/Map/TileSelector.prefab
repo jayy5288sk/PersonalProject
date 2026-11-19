@@ -47,6 +47,6 @@ MonoBehaviour:
   _mapGenerator: {fileID: 0}
   _terrainOverlap: {fileID: -1086660989781745477, guid: 8b23bff190deabe42a805970bfeab07f, type: 3}
   _terrainClick: {fileID: -16624684595542956, guid: 8b23bff190deabe42a805970bfeab07f, type: 3}
-  _groundHeight: 0.75
   _highlightOffset: 0.01
-  _highlightPrefab: {fileID: 8979534103307165, guid: c299f73339364a548aa9321a2bdbeb3a, type: 3}
+  _highlightPrefab: {fileID: 4017560668649727605, guid: d877137041b34934681a68f3cdb5ca2d, type: 3}
+  _stateManager: {fileID: 0}

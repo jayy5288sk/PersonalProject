@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -18,6 +19,8 @@ public class TileSelector : MonoBehaviour
     private Vector2Int _currentSection = new(-1, -1); // 맵 어느 구역인지(열, 행)
     private Plane _groundCheckPlane; // 마우스 Ray 계산용 바닥 평면
     private GameObject _groundHighlight; // 지정된 프리팹(_highlightPrefab) 복사본 용도
+
+    public event Action<Vector2Int> OnPointedSectionChanged;   // 맵 밖이면 (-1, -1)
 
     private void Awake() => Init();
 
@@ -105,6 +108,7 @@ public class TileSelector : MonoBehaviour
         _groundHighlight.transform.position = _mapGenerator.ReturnTerrainPosition(section) +
                                               (Vector3.up * _highlightOffset);
         _groundHighlight.SetActive(true);
+        OnPointedSectionChanged?.Invoke(_currentSection);
     }
 
     // 마우스 화면 좌표 → 바닥 평면 위의 월드 좌표
@@ -134,6 +138,7 @@ public class TileSelector : MonoBehaviour
         _isMapInside = false;
         _currentSection = new Vector2Int(-1, -1);
         _groundHighlight.SetActive(false);
+        OnPointedSectionChanged?.Invoke(_currentSection);
     }
 
     private void Init()

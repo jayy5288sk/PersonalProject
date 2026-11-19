@@ -45,4 +45,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoveRangeDisplay
   _mobilityPrefab: {fileID: 1748603359800874117, guid: 1e0819dc383daca4aa2935360698fec3, type: 3}
-  _prefabHeight: 0.02
+  _prefabHeight: 0.03

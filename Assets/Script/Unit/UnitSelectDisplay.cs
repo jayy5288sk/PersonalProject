@@ -6,7 +6,7 @@ public class UnitSelectDisplay : MonoBehaviour
     [SerializeField] private GameObject _headMarkerPrefab;
     [SerializeField] private MapGenerator _mapGenerator;
     [SerializeField] private float _groundQuadHeight = 0.04f;
-    [SerializeField] private float _headMarkerHeight = 2f;
+    [SerializeField] private float _headMarkerHeight = 1.5f;
     
     private GameObject _groundQuad;
     private GameObject _headMarker;

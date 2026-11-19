@@ -13,6 +13,7 @@ public class PhaseManager : MonoBehaviour
     private PhaseBase _currentPhase;
     private readonly List<MapUnit> _allyUnits = new();
 
+    public int TurnCount { get; private set; }
     public event Action<PhaseType> OnPhaseChanged;
 
     private void Awake() => Init();
@@ -107,6 +108,10 @@ public class PhaseManager : MonoBehaviour
         {
             _currentPhase?.PhaseExit();
             _currentPhase = nextPhase;
+            if (_currentPhase == _allyPhase)
+            {
+                TurnCount++;
+            }
             nextPhase = _currentPhase.PhaseEnter();
             OnPhaseChanged?.Invoke(_currentPhase.PhaseName());
         }

@@ -5,17 +5,20 @@ public class TempLog : MonoBehaviour
 {
     [SerializeField] private StateManager _stateManager;
     [SerializeField] private PhaseManager _phaseManager;
+    [SerializeField] private BattleResultJudge _resultJudge;
 
     private void OnEnable()
     {
         _stateManager.OnStateChanged += PrintLog;
         _phaseManager.OnPhaseChanged += PrintPhaseLog;
+        _resultJudge.OnBattleResult += PrintDestroyUnitLog;
     }
 
     private void OnDisable()
     {
         _stateManager.OnStateChanged -= PrintLog;
         _phaseManager.OnPhaseChanged -= PrintPhaseLog;
+        _resultJudge.OnBattleResult -= PrintDestroyUnitLog;
     }
 
     private void PrintLog(StateType state)
@@ -25,6 +28,11 @@ public class TempLog : MonoBehaviour
 
     private void PrintPhaseLog(PhaseType phase)
     {
-        Debug.Log($"[Phase] {phase}");
+        Debug.Log($"[Phase] {phase} / Turn {_phaseManager.TurnCount}");
+    }
+
+    private void PrintDestroyUnitLog(BattleResult result)
+    {
+        Debug.Log($"[Result] {result} / 격파 {_resultJudge.EnemyKillCount} / 손실 {_resultJudge.AllyDeathCount}");
     }
 }

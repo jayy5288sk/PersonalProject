@@ -44,8 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8154dd8835da4d44aba340b74cd77563, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitSelectDisplay
-  _groundQuadPrefab: {fileID: 6251883167038255755, guid: 153209e0f56511647b8d87fb075801d5, type: 3}
-  _headMarkerPrefab: {fileID: 2992969865933952847, guid: 0071fadd189ff6f44af1c407798162e3, type: 3}
+  _groundQuadPrefab: {fileID: 6660431534744846148, guid: 4ab2a661e575eb74886fb271bc8a5eeb, type: 3}
+  _headMarkerPrefab: {fileID: 5453260233195891578, guid: b97f720dd5e7a8a4b815b76189fae2e6, type: 3}
   _mapGenerator: {fileID: 0}
   _groundQuadHeight: 0.04
   _headMarkerHeight: 2

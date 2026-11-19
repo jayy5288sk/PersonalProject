@@ -12,6 +12,7 @@ public class PhaseManager : MonoBehaviour
     private AllyPhase _allyPhase;
     private EnemyPhase _enemyPhase;
     private PhaseBase _currentPhase;
+    private bool _isGameOver;
     private readonly List<MapUnit> _allyUnits = new();
 
     public int TurnCount { get; private set; }
@@ -28,7 +29,7 @@ public class PhaseManager : MonoBehaviour
     /// </summary>
     public void RequestTurnEnd()
     {
-        if (_currentPhase != _allyPhase)
+        if (_isGameOver || _currentPhase != _allyPhase)
         {
             return;
         }
@@ -41,6 +42,7 @@ public class PhaseManager : MonoBehaviour
         _unitGenerator.OnUnitPlacementCompleted += HandleUnitPlacementCompleted;
         _stateManager.OnStateChanged += HandleStateChanged;
         _enemyAIController.OnEnemyTurnCompleted += HandleEnemyTurnCompleted;
+        _battleResultJudge.OnBattleResult += SetBattleResult;
     }
 
     private void UnbindEvents()
@@ -48,12 +50,13 @@ public class PhaseManager : MonoBehaviour
         _unitGenerator.OnUnitPlacementCompleted -= HandleUnitPlacementCompleted;
         _stateManager.OnStateChanged -= HandleStateChanged;
         _enemyAIController.OnEnemyTurnCompleted -= HandleEnemyTurnCompleted;
+        _battleResultJudge.OnBattleResult -= SetBattleResult;
     }
 
     // 적 전원 행동 완료 시 아군 페이즈로 복귀
     private void HandleEnemyTurnCompleted()
     {
-        if (_currentPhase != _enemyPhase)
+        if (_isGameOver || _currentPhase != _enemyPhase)
         {
             return;
         }
@@ -70,7 +73,8 @@ public class PhaseManager : MonoBehaviour
     // 유닛 선택 대기로 돌아올 때마다 아군 전원 행동 완료인지 확인
     private void HandleStateChanged(StateType state)
     {
-        if (_currentPhase != _allyPhase || state != StateType.UnitSelectStandBy)
+        if (_isGameOver || (_currentPhase != _allyPhase || 
+                            state != StateType.UnitSelectStandBy))
         {
             return;
         }
@@ -116,6 +120,13 @@ public class PhaseManager : MonoBehaviour
             nextPhase = _currentPhase.PhaseEnter();
             OnPhaseChanged?.Invoke(_currentPhase.PhaseName());
         }
+    }
+
+    private void SetBattleResult(BattleResult result)
+    {
+        _isGameOver = true;
+        _stateManager.SetInputLock(true);
+        _enemyAIController.StopEnemyTurn();
     }
 
     private void Init()

@@ -20,15 +20,15 @@ public class BattleResultJudge : MonoBehaviour
 
     private void BindEvents()
     {
-        _unitGenerator.OnUnitDeath += Foo;
+        _unitGenerator.OnUnitDeath += UnitDeath;
     }
 
     private void UnbindEvents()
     {
-        _unitGenerator.OnUnitDeath -= Foo;
+        _unitGenerator.OnUnitDeath -= UnitDeath;
     }
 
-    private void Foo(MapUnit unit)
+    private void UnitDeath(MapUnit unit)
     {
         if (_isGameOver) 
         {

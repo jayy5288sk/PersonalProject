@@ -43,9 +43,9 @@ public class BattleResultHUD : MonoBehaviour
         _resultPanel.SetActive(true);
 
         _titleText.text = isVictory ? VICTORY_TITLE : DEFEAT_TITLE;
-        _turnText.text = $"Turn {_phaseManager.TurnCount}";
-        _enemyKillText.text = $"Enemies Defeated {_battleResultJudge.EnemyKillCount}";
-        _allyDeathText.text = $"Allies Lost {_battleResultJudge.AllyDeathCount}";
+        _turnText.text = $"{_phaseManager.TurnCount}";
+        _enemyKillText.text = $"{_battleResultJudge.EnemyKillCount}";
+        _allyDeathText.text = $"{_battleResultJudge.AllyDeathCount}";
 
         _nextStageButton.gameObject.SetActive(isVictory);
     }

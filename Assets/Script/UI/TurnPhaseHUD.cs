@@ -7,7 +7,8 @@ public class TurnPhaseHUD : MonoBehaviour
     private const string ENEMY_PHASE_NAME = "Enemy Phase";
 
     [SerializeField] private PhaseManager _phaseManager;
-    [SerializeField] private TextMeshProUGUI _turnPhaseText;
+    [SerializeField] private TextMeshProUGUI _turnText;
+    [SerializeField] private TextMeshProUGUI _phaseText;
 
     private void OnEnable() => BindEvents();
 
@@ -27,6 +28,8 @@ public class TurnPhaseHUD : MonoBehaviour
     private void HandlePhaseChanged(PhaseType phase)
     {
         string phaseName = phase == PhaseType.Ally ? ALLY_PHASE_NAME : ENEMY_PHASE_NAME;
-        _turnPhaseText.text = $"Turn {_phaseManager.TurnCount} · {phaseName}";
+        
+        _phaseText.text = phaseName;
+        _turnText.text = $"Turn {_phaseManager.TurnCount}";
     }
 }

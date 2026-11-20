@@ -1757,6 +1757,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9aaee2b8e86215747a6fd1654aa99aaa, type: 3}
+--- !u!114 &2913626579283294009 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5379219458991155985, guid: 9aaee2b8e86215747a6fd1654aa99aaa, type: 3}
+  m_PrefabInstance: {fileID: 2913626579283294008}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2266b97eaac10340a9d85735485d77f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HeadDataLoader
 --- !u!1001 &4325048877875763824
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2000,6 +2011,10 @@ PrefabInstance:
       propertyPath: _phaseManager
       value: 
       objectReference: {fileID: 6886075261606988477}
+    - target: {fileID: 343198340101222756, guid: fb72c57598b686c4394809b83febe34a, type: 3}
+      propertyPath: _headDataLoader
+      value: 
+      objectReference: {fileID: 2913626579283294009}
     - target: {fileID: 343198340101222756, guid: fb72c57598b686c4394809b83febe34a, type: 3}
       propertyPath: _battleResultJudge
       value: 

@@ -7,17 +7,19 @@ public class BattleResultHUD : MonoBehaviour
 {
     private const string VICTORY_TITLE = "Stage Clear";
     private const string DEFEAT_TITLE = "Defeated";
+    private const float NORMAL_TIME_SCALE = 1f;
 
     [SerializeField] private BattleResultJudge _battleResultJudge;
     [SerializeField] private PhaseManager _phaseManager;
+    [SerializeField] private HeadDataLoader _headDataLoader;
     [SerializeField] private GameObject _resultPanel;
     [SerializeField] private TextMeshProUGUI _titleText;
     [SerializeField] private TextMeshProUGUI _turnText;
     [SerializeField] private TextMeshProUGUI _enemyKillText;
     [SerializeField] private TextMeshProUGUI _allyDeathText;
-    [SerializeField] private Button _nextStageButton;   // 동작 연결은 스테이지 선택 구현 시
+    [SerializeField] private Button _nextStageButton;
     [SerializeField] private Button _retryButton;
-    [SerializeField] private Button _mainMenuButton;    // 동작 연결은 메인 메뉴 구현 시
+    [SerializeField] private Button _mainMenuButton;
 
     private void OnEnable() => BindEvents();
 
@@ -26,13 +28,17 @@ public class BattleResultHUD : MonoBehaviour
     private void BindEvents()
     {
         _battleResultJudge.OnBattleResult += HandleBattleResult;
+        _nextStageButton.onClick.AddListener(HandleNextStageClicked);
         _retryButton.onClick.AddListener(HandleRetryClicked);
+        _mainMenuButton.onClick.AddListener(HandleMainMenuClicked);
     }
 
     private void UnbindEvents()
     {
         _battleResultJudge.OnBattleResult -= HandleBattleResult;
+        _nextStageButton.onClick.RemoveListener(HandleNextStageClicked);
         _retryButton.onClick.RemoveListener(HandleRetryClicked);
+        _mainMenuButton.onClick.RemoveListener(HandleMainMenuClicked);
     }
 
     // 결과 패널 표시
@@ -50,9 +56,28 @@ public class BattleResultHUD : MonoBehaviour
         _nextStageButton.gameObject.SetActive(isVictory);
     }
 
-    // 현재 씬을 다시 불러와 처음 상태로 재시작
+    // 다음 스테이지로 진행. 마지막 스테이지 다음은 첫 스테이지로 순환
+    private void HandleNextStageClicked()
+    {
+        StageSelection.SelectedStageIndex = (StageSelection.SelectedStageIndex + 1) % _headDataLoader.StageCount;
+        LoadSceneWithTimeReset(SceneIndex.BATTLE);
+    }
+
+    // 선택한 스테이지 번호가 그대로 남아 있으므로 같은 스테이지로 재시작
     private void HandleRetryClicked()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        LoadSceneWithTimeReset(SceneIndex.BATTLE);
+    }
+
+    private void HandleMainMenuClicked()
+    {
+        LoadSceneWithTimeReset(SceneIndex.MAIN_MENU);
+    }
+
+    // timeScale은 씬을 바꿔도 유지되므로 이동 전에 되돌림
+    private void LoadSceneWithTimeReset(int sceneIndex)
+    {
+        Time.timeScale = NORMAL_TIME_SCALE;
+        SceneManager.LoadScene(sceneIndex);
     }
 }

@@ -3,11 +3,56 @@
 >
 > 점선은 미구현 흐름을 나타낸다.
 
+## 씬 흐름·스테이지 선택 (F-03, F-10, F-11, F-12)
+
+```mermaid
+flowchart TB
+    subgraph Menu["MainMenuScene (빌드 0번)"]
+        direction TB
+        Main["<b>MainPanel</b><br/>게임 시작 · 종료"]
+        Select["<b>StageSelectPanel</b><br/>Stage 1 · Stage 2 · Back"]
+        Main -->|게임 시작| Select
+        Select -->|Back| Main
+    end
+
+    Sel[("<b>StageSelection</b> (static)<br/>SelectedStageIndex<br/>씬을 바꿔도 유지")]
+
+    subgraph Battle["InGameScene (빌드 1번)"]
+        direction TB
+        Head["<b>HeadDataLoader</b><br/>_stages[SelectedStageIndex]<br/>→ 외부 데이터 로딩 참고"]
+        Fight["전투 진행"]
+        Result["<b>BattleResultHUD</b><br/>결과 패널"]
+        Pause["<b>PauseHUD</b><br/>일시정지 패널"]
+        Head --> Fight
+        Fight -.->|OnBattleResult| Result
+        Fight -->|Esc · 일시정지 버튼| Pause
+    end
+
+    Select -->|"Stage i: SelectedStageIndex = i"| Sel
+    Sel -->|"LoadScene(SceneIndex.BATTLE)"| Head
+    Result -->|"다음 스테이지<br/>(번호 + 1) % StageCount"| Sel
+    Result -->|"재도전 (번호 그대로)<br/>LoadScene(BATTLE)"| Head
+    Result -->|"메인 메뉴<br/>LoadScene(MAIN_MENU)"| Main
+    Pause -->|"메인 메뉴<br/>LoadScene(MAIN_MENU)"| Main
+    Main -->|종료| Quit(["Application.Quit<br/>(에디터: Play 중지)"])
+```
+
+> 전투 씬에서 다른 씬으로 가는 모든 버튼은 로드 전에 `TimeManager.Resume()`으로 `timeScale`을 1로 되돌린다. `timeScale`은 static 값처럼 씬을 바꿔도 남는다.
+
+> `SceneIndex`의 번호는 `File > Build Profiles > Scene List` 순서와 같아야 한다. 전투 씬을 바로 실행하면 `SelectedStageIndex` 기본값 0으로 스테이지 1이 로드된다.
+
 ## 외부 데이터 로딩 (F-01, F-03)
 
 ```mermaid
 flowchart TB
-    Head["<b>HeadDataLoader</b><br/>LoadExternalDataRoutine()<br/>다섯 로더 동시 실행 후 완료 대기"]
+    Sel[("<b>StageSelection</b><br/>SelectedStageIndex")]
+    Stages["<b>_stages (StageData[])</b><br/>DataLoader.prefab에서 연결<br/>0 = Stage1, 1 = Stage2"]
+    Stage["<b>StageData (SO)</b><br/>StageName · MapTsvUrl · UnitSpawnTsvUrl"]
+    Head["<b>HeadDataLoader</b><br/>LoadExternalDataRoutine()<br/>고른 스테이지의 주소를 로더에 전달<br/>다섯 로더 동시 실행 후 완료 대기<br/>StageCount 공개"]
+
+    Sel -->|번호| Stages
+    Stages -->|"_stages[번호]"| Stage
+    Stage -->|맵·스폰 주소| Head
 
     subgraph Unit["유닛"]
         direction TB
@@ -39,7 +84,7 @@ flowchart TB
     subgraph Map["맵 디자인"]
         direction TB
         MapSheet[("스테이지 맵 TSV 시트")]
-        MapLoader["<b>MapDesignDataLoader</b><br/>LoadMapTable()"]
+        MapLoader["<b>MapDesignDataLoader</b><br/>LoadMapTable(mapTsvUrl)"]
         MapArray["<b>MapArray (JArray)</b><br/>[행][열] = 지형 ID"]
         MapSheet -->|다운로드| MapLoader
         MapLoader -->|변환 후 보관| MapArray
@@ -48,7 +93,7 @@ flowchart TB
     subgraph Spawn["스폰 디자인"]
         direction TB
         SpawnSheet[("스테이지 스폰 TSV 시트")]
-        SpawnLoader["<b>UnitSpawnDataLoader</b><br/>LoadUnitSpawnTable()"]
+        SpawnLoader["<b>UnitSpawnDataLoader</b><br/>LoadUnitSpawnTable(unitSpawnTsvUrl)"]
         SpawnArray["<b>UnitSpawnArray (JArray)</b><br/>[행][열] = { Id, Behavior }<br/>칸 형식: ID 또는 ID:A / ID:D"]
         SpawnSheet -->|다운로드| SpawnLoader
         SpawnLoader -->|변환 후 보관| SpawnArray
@@ -60,8 +105,8 @@ flowchart TB
     Head -->|코루틴 실행| UnitLoader
     Head -->|코루틴 실행| WeaponLoader
     Head -->|코루틴 실행| TerrainLoader
-    Head -->|코루틴 실행| MapLoader
-    Head -->|코루틴 실행| SpawnLoader
+    Head -->|"코루틴 실행 (MapTsvUrl)"| MapLoader
+    Head -->|"코루틴 실행 (UnitSpawnTsvUrl)"| SpawnLoader
     Head -->|1. 모든 로드 완료 후 MapArray 전달| Generator
     Head -->|2. 맵 생성 다음, UnitSpawnArray·맵 행 수 전달| UnitGen
 ```
@@ -486,11 +531,42 @@ flowchart LR
     On --> Title["제목<br/>Victory → Stage Clear<br/>Defeat → Defeated"]
     On --> Stat["Turn = PhaseManager.TurnCount<br/>격파 = EnemyKillCount<br/>손실 = AllyDeathCount"]
     On --> Next["다음 스테이지 버튼<br/>승리 시에만 표시"]
-    Retry["재도전 onClick"] --> Load["SceneManager.LoadScene<br/>(현재 씬 buildIndex)"]
-    Menu["다음 스테이지 · 메인 메뉴 onClick"] -.->|미구현, 11/20| Later["스테이지 선택 · 메인 메뉴"]
+    NextBtn["다음 스테이지 onClick"] --> Idx["SelectedStageIndex =<br/>(번호 + 1) % HeadDataLoader.StageCount<br/>마지막 다음은 스테이지 1"]
+    Idx --> Load
+    Retry["재도전 onClick<br/>(번호 그대로)"] --> Load["LoadSceneWithTimeReset()<br/>TimeManager.Resume()<br/>→ LoadScene(SceneIndex.BATTLE)"]
+    Menu["메인 메뉴 onClick"] --> LoadM["LoadSceneWithTimeReset()<br/>TimeManager.Resume()<br/>→ LoadScene(SceneIndex.MAIN_MENU)"]
 ```
 
 > HUD 스크립트는 항상 켜진 오브젝트에 두고 `_resultPanel`만 끄고 켠다. 꺼진 오브젝트에 두면 `OnEnable`이 불리지 않아 구독하지 못한다.
+
+> `BattleResultHUD`는 `CommandUI.prefab` 안에 있어 `_headDataLoader`, `_timeManager`, `_battleResultJudge`는 씬 인스턴스에서 연결한다. 프리팹 파일끼리는 서로를 참조할 수 없다.
+
+## 일시정지 (F-10)
+
+```mermaid
+flowchart TB
+    Esc["Esc<br/>GameMap/Pause"] -->|TogglePause| TM
+    PBtn["일시정지 버튼"] -->|Pause| TM
+    RBtn["재개 버튼"] -->|Resume| TM
+    MBtn["메인 메뉴 버튼"] -->|"Resume → LoadScene(MAIN_MENU)"| TM
+
+    subgraph TM["TimeManager"]
+        direction TB
+        Over{"_isGameOver?<br/>(Pause만 확인)"}
+        Set["SetPaused()<br/>IsPaused 갱신<br/>Time.timeScale = 0 / 1"]
+        Over -->|아니오| Set
+    end
+    Over -->|예| Ignore["무시"]
+
+    Judge["<b>BattleResultJudge</b>"] -.->|"OnBattleResult<br/>_isGameOver = true"| TM
+    Set --> Evt(["OnPauseChanged(bool)"])
+    Evt -.->|구독| HUD["<b>PauseHUD</b><br/>_pausePanel.SetActive(isPaused)"]
+    Evt -.->|미구현| Sound["사운드<br/>일시정지 중 소리 멈춤"]
+```
+
+> `PauseHUD`는 입력 전달과 패널 표시만 하고 `timeScale`을 직접 다루지 않는다. 시간은 `TimeManager`만 다룬다.
+
+> `timeScale = 0`이 멈추는 것: 적 행동 대기(`WaitForSeconds`), 카메라 이동(`deltaTime`). 멈추지 않는 것: `Update()`, 입력. 그래서 패널 배경 Image가 Raycast를 받아 칸 클릭(`TileSelector._isPointerOverUI`)과 뒤쪽 버튼을 막는다.
 
 ## 인게임 UI (F-10, F-07)
 
@@ -498,7 +574,7 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    PM["<b>PhaseManager</b>"] -.->|"OnPhaseChanged"| TP["<b>TurnPhaseHUD</b><br/>Turn N · Ally/Enemy Phase"]
+    PM["<b>PhaseManager</b>"] -.->|"OnPhaseChanged"| TP["<b>TurnPhaseHUD</b><br/>턴 텍스트: Turn N<br/>페이즈 텍스트: Ally/Enemy Phase"]
     PM -.->|"OnPhaseChanged"| HI
     TS["<b>TileSelector</b>"] -.->|"OnPointedSectionChanged"| HI["<b>HoverInfoHUD</b><br/>지형 · 유닛 · HP · EN"]
     TS -.->|"OnPointedSectionChanged"| BF["<b>BattleForecastHUD</b><br/>예상 전투 결과"]
@@ -517,12 +593,15 @@ flowchart LR
 flowchart LR
     In["마지막 칸"] --> Out{"(-1, -1) 또는<br/>지형 사전에 없음?"}
     Out -->|예| Off["패널 끄기"]
-    Out -->|아니오| Ter["지형 줄<br/>TileName + MOVE RequireMove<br/>(진입 불가면 Impassable)"]
+    Out -->|아니오| Ter["지형 텍스트<br/>이름 = TileName<br/>이동 비용 = RequireMove<br/>(진입 불가면 Impassable)"]
     Ter --> U{"TryGetUnitAtSection?"}
-    U -->|예| Unit["유닛 줄 추가<br/>UnitName [TeamSide]<br/>HP 현재/최대 · EN 현재/최대"]
-    U -->|아니오| Show["패널 켜기"]
-    Unit --> Show
+    U -->|예| Unit["SetUnitInfoActive(true)<br/>이름 · 진영 · HP 현재/최대 · EN 현재/최대"]
+    U -->|아니오| Hide["SetUnitInfoActive(false)<br/>유닛 텍스트 4개 끄기"]
+    Unit --> Show["패널 켜기"]
+    Hide --> Show
 ```
+
+> 유닛 텍스트는 그룹 오브젝트 없이 개별로 끈다. 꺼진 자식은 Layout Group 배치에서 빠져 패널이 줄어든다.
 
 ### 예상 전투 결과 (BattleForecastHUD.Refresh)
 
@@ -534,7 +613,8 @@ flowchart LR
     St -->|예| Col["<b>AttackTargetSelect</b><br/>TryCollectTargetsAt()<br/>(실제 공격과 같은 코드)"]
     Col --> Any{"범위 안 · 대상 있음?"}
     Any -->|아니오| Off
-    Any -->|예| Line["대상마다<br/><b>BattleCalculator</b>.CalculateDamage()<br/>이름 HP 현재 → 이후 (-데미지)<br/>이후 0이면 DEFEAT"]
+    Any -->|예| Label["RefreshLabel()<br/>라벨 = 공격자 → 피격자1, 피격자2"]
+    Label --> Line["RefreshDesc()<br/>대상마다 <b>BattleCalculator</b>.CalculateDamage()<br/>HP 현재 → 이후 (-데미지)<br/>대상 2명 이상이면 줄 앞에 이름<br/>이후 0이면 DEFEAT"]
     Line --> On["패널 켜기"]
 ```
 

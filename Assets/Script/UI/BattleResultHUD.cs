@@ -19,8 +19,7 @@ public class BattleResultHUD : MonoBehaviour
     [SerializeField] private Button _nextStageButton;
     [SerializeField] private Button _retryButton;
     [SerializeField] private Button _mainMenuButton;
-    
-    private TimeManager _timeManager;
+    [SerializeField] private TimeManager _timeManager;
 
     private void OnEnable() => BindEvents();
 

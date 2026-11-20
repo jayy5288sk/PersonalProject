@@ -2392,6 +2392,10 @@ PrefabInstance:
       value: -27.41
       objectReference: {fileID: 0}
     - target: {fileID: 343198340101222756, guid: fb72c57598b686c4394809b83febe34a, type: 3}
+      propertyPath: _timeManager
+      value: 
+      objectReference: {fileID: 1863563765}
+    - target: {fileID: 343198340101222756, guid: fb72c57598b686c4394809b83febe34a, type: 3}
       propertyPath: _phaseManager
       value: 
       objectReference: {fileID: 6886075261606988477}

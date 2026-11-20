@@ -7,7 +7,6 @@ public class BattleResultHUD : MonoBehaviour
 {
     private const string VICTORY_TITLE = "Stage Clear";
     private const string DEFEAT_TITLE = "Defeated";
-    private const float NORMAL_TIME_SCALE = 1f;
 
     [SerializeField] private BattleResultJudge _battleResultJudge;
     [SerializeField] private PhaseManager _phaseManager;
@@ -20,6 +19,8 @@ public class BattleResultHUD : MonoBehaviour
     [SerializeField] private Button _nextStageButton;
     [SerializeField] private Button _retryButton;
     [SerializeField] private Button _mainMenuButton;
+    
+    private TimeManager _timeManager;
 
     private void OnEnable() => BindEvents();
 
@@ -77,7 +78,7 @@ public class BattleResultHUD : MonoBehaviour
     // timeScale은 씬을 바꿔도 유지되므로 이동 전에 되돌림
     private void LoadSceneWithTimeReset(int sceneIndex)
     {
-        Time.timeScale = NORMAL_TIME_SCALE;
+        _timeManager.Resume();
         SceneManager.LoadScene(sceneIndex);
     }
 }

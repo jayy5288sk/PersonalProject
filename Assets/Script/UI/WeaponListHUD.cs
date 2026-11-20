@@ -11,7 +11,11 @@ public class WeaponListHUD : MonoBehaviour
     [SerializeField] private TextMeshProUGUI[] _weaponTexts;     // _weaponButtons와 같은 순서
     [SerializeField] private WeaponDataHover[] _weaponHovers;    // _weaponButtons와 같은 순서
     [SerializeField] private GameObject _weaponInfoPanel;
-    [SerializeField] private TextMeshProUGUI _weaponInfoText;
+    [SerializeField] private TextMeshProUGUI _weaponName;
+    [SerializeField] private TextMeshProUGUI _weaponRange;
+    [SerializeField] private TextMeshProUGUI _weaponAttackDamage;
+    [SerializeField] private TextMeshProUGUI _weaponRequireEnerge;
+    [SerializeField] private TextMeshProUGUI _weaponRangeShape;
 
     private void OnEnable() => BindEvents();
     private void OnDisable() => UnBindEvents();
@@ -101,9 +105,13 @@ public class WeaponListHUD : MonoBehaviour
         }
 
         WeaponData weapon = weapons[weaponIndex];
-        _weaponInfoText.text = $"{weapon.WeaponName}\n" +
-                               $"RNG {weapon.MinRange}~{weapon.MaxRange}  ATK {weapon.AttackDamage}\n" +
-                               $"EN {weapon.RequireEn}  Shape {weapon.RangeShape}";
+                
+        _weaponName.text = $"{weapon.WeaponName}";
+        _weaponRange.text = $"{weapon.MinRange} ~ {weapon.MaxRange}";
+        _weaponAttackDamage.text = $"{weapon.AttackDamage}";
+        _weaponRequireEnerge.text = $"{weapon.RequireEn}";
+        _weaponRangeShape.text = $"{weapon.RangeShape}";
+        
         _weaponInfoPanel.SetActive(true);
     }
 

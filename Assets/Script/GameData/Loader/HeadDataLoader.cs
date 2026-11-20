@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class HeadDataLoader : MonoBehaviour
 {
+    [SerializeField] private StageData[] _stages;
+    
     [SerializeField] private UnitDataLoader _unitDataLoader;
     [SerializeField] private WeaponDataLoader _weaponDataLoader;
     [SerializeField] private TerrainDataLoader _terrainDataLoader;
@@ -15,6 +17,8 @@ public class HeadDataLoader : MonoBehaviour
     [SerializeField] private UnitSpawnDataLoader _unitSpawnDataLoader;
     [SerializeField] private UnitGenerator _unitGenerator;
     
+    public int StageCount => _stages.Length; // 총 스테이지 수
+    
     private void Awake() => LoadData();
 
     private void LoadData()
@@ -24,11 +28,13 @@ public class HeadDataLoader : MonoBehaviour
 
     public IEnumerator LoadExternalDataRoutine()
     {
+        StageData stage = _stages[StageSelection.SelectedStageIndex];
+        
         Coroutine unitRoutine = StartCoroutine(_unitDataLoader.LoadUnitTable());
         Coroutine weaponRoutine = StartCoroutine(_weaponDataLoader.LoadWeaponTable());
         Coroutine terrainRoutine = StartCoroutine(_terrainDataLoader.LoadTerrainTable());
-        Coroutine mapRoutine = StartCoroutine(_mapDesignDataLoader.LoadMapTable());
-        Coroutine unitSpawnRoutine = StartCoroutine(_unitSpawnDataLoader.LoadUnitSpawnTable());
+        Coroutine mapRoutine = StartCoroutine(_mapDesignDataLoader.LoadMapTable(stage.MapTsvUrl));
+        Coroutine unitSpawnRoutine = StartCoroutine(_unitSpawnDataLoader.LoadUnitSpawnTable(stage.UnitSpawnTsvUrl));
         
         yield return unitRoutine;
         yield return weaponRoutine;

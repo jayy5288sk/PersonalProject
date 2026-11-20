@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TerrainData
   _id: 3
   _tileName: 
-  _requireMove: 0
   _isMoveAvailable: 0
-  _tilePrefab: {fileID: 1189827448020442738, guid: 9e3e508e935d0fd4b88a5349c409ad82, type: 3}
+  _requireMove: 0
+  _tilePrefab: {fileID: 7015369545892882176, guid: d83dc454c399bb94db63d9b337c61350, type: 3}

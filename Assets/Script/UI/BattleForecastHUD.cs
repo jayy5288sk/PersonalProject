@@ -6,12 +6,16 @@ using UnityEngine;
 public class BattleForecastHUD : MonoBehaviour
 {
     private const string DEFEAT_MARK = "  DEFEAT";
+    private const string ARROW = " → ";
+    private const string TARGET_SEPARATOR = ", ";
+    private const string NAME_GAP = "  ";
     private static readonly Vector2Int NO_SECTION = new(-1, -1);   // TileSelector가 맵 밖일 때 보내는 값
 
     [SerializeField] private TileSelector _tileSelector;
     [SerializeField] private StateManager _stateManager;
     [SerializeField] private GameObject _forecastPanel;
-    [SerializeField] private TextMeshProUGUI _forecastText;
+    [SerializeField] private TextMeshProUGUI _labelText;   // 공격자 → 피격자
+    [SerializeField] private TextMeshProUGUI _descText;    // 피격자가 받는 데미지
 
     private readonly List<MapUnit> _forecastTargets = new();
     private readonly StringBuilder _forecastBuilder = new();
@@ -54,7 +58,36 @@ public class BattleForecastHUD : MonoBehaviour
         }
 
         MapUnit attacker = _stateManager.SelectedUnit;
-        WeaponData weapon = _stateManager.SelectedWeapon;
+
+        RefreshLabel(attacker);
+        RefreshDesc(attacker, _stateManager.SelectedWeapon);
+
+        _forecastPanel.SetActive(true);
+    }
+
+    // 공격자 → 피격자1, 피격자2
+    private void RefreshLabel(MapUnit attacker)
+    {
+        _forecastBuilder.Clear();
+        _forecastBuilder.Append(attacker.SelectUnitData.UnitName).Append(ARROW);
+
+        for (int i = 0; i < _forecastTargets.Count; i++)
+        {
+            if (i > 0)
+            {
+                _forecastBuilder.Append(TARGET_SEPARATOR);
+            }
+
+            _forecastBuilder.Append(_forecastTargets[i].SelectUnitData.UnitName);
+        }
+
+        _labelText.SetText(_forecastBuilder);
+    }
+
+    // 대상이 여럿이면 어느 줄이 누구인지 알 수 있도록 줄 앞에 이름을 붙임
+    private void RefreshDesc(MapUnit attacker, WeaponData weapon)
+    {
+        bool hasMultipleTargets = _forecastTargets.Count > 1;
 
         _forecastBuilder.Clear();
         for (int i = 0; i < _forecastTargets.Count; i++)
@@ -68,9 +101,13 @@ public class BattleForecastHUD : MonoBehaviour
                 _forecastBuilder.Append('\n');
             }
 
-            _forecastBuilder.Append(target.SelectUnitData.UnitName)
-                            .Append("  HP ").Append(target.CurrentHp)
-                            .Append(" → ").Append(afterHp)
+            if (hasMultipleTargets)
+            {
+                _forecastBuilder.Append(target.SelectUnitData.UnitName).Append(NAME_GAP);
+            }
+
+            _forecastBuilder.Append("HP ").Append(target.CurrentHp)
+                            .Append(ARROW).Append(afterHp)
                             .Append(" (-").Append(damage).Append(')');
 
             if (afterHp == 0)
@@ -79,7 +116,6 @@ public class BattleForecastHUD : MonoBehaviour
             }
         }
 
-        _forecastText.SetText(_forecastBuilder);
-        _forecastPanel.SetActive(true);
+        _descText.SetText(_forecastBuilder);
     }
 }

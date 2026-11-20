@@ -6,8 +6,6 @@ using Newtonsoft.Json.Linq;
 
 public class UnitSpawnDataLoader : MonoBehaviour
 {
-    [SerializeField] private string _unitSpawnTsvUrl;
-
     private const int INVALID_UNIT_ID = -1;
     private const int EMPTY_UNIT = 0; // 유닛 없음. 유닛 ID로 사용하지 않음.
     private const char BEHAVIOR_SEPARATOR = ':'; // 칸 형식: "유닛ID" 또는 "유닛ID:행동코드"
@@ -19,15 +17,15 @@ public class UnitSpawnDataLoader : MonoBehaviour
 
     public JArray UnitSpawnArray { get; private set; }
 
-    public IEnumerator LoadUnitSpawnTable()
+    public IEnumerator LoadUnitSpawnTable(string unitSpawnTsvUrl)
     {
-        if (_unitSpawnTsvUrl == null || _unitSpawnTsvUrl.Trim() == "") 
+        if (unitSpawnTsvUrl == null || unitSpawnTsvUrl.Trim() == "") 
         {
             Debug.Log("스폰 디자인 URL이 비어있다");
             yield break;
         }
         
-        using (UnityWebRequest unityWebRequest = UnityWebRequest.Get(_unitSpawnTsvUrl))
+        using (UnityWebRequest unityWebRequest = UnityWebRequest.Get(unitSpawnTsvUrl))
         {
             // 요청이 완료될 때까지 대기
             yield return unityWebRequest.SendWebRequest();

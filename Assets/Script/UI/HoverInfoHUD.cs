@@ -1,4 +1,3 @@
-using System.Text;
 using TMPro;
 using UnityEngine;
 
@@ -13,9 +12,13 @@ public class HoverInfoHUD : MonoBehaviour
     [SerializeField] private StateManager _stateManager;
     [SerializeField] private PhaseManager _phaseManager;
     [SerializeField] private GameObject _hoverInfoPanel;
-    [SerializeField] private TextMeshProUGUI _hoverInfoText;
+    [SerializeField] private TextMeshProUGUI _tileNameText;
+    [SerializeField] private TextMeshProUGUI _moveCostText;
+    [SerializeField] private TextMeshProUGUI _unitNameText;
+    [SerializeField] private TextMeshProUGUI _teamText;
+    [SerializeField] private TextMeshProUGUI _hpText;
+    [SerializeField] private TextMeshProUGUI _enText;
 
-    private readonly StringBuilder _infoBuilder = new();
     private Vector2Int _lastSection = NO_SECTION;
 
     private void OnEnable() => BindEvents();
@@ -56,26 +59,29 @@ public class HoverInfoHUD : MonoBehaviour
             return;
         }
 
-        _infoBuilder.Clear();
-        _infoBuilder.Append(terrain.TileName).Append("  ");
-        if (terrain.IsMoveAvailable)
-        {
-            _infoBuilder.Append("MOVE ").Append(terrain.RequireMove);
-        }
-        else
-        {
-            _infoBuilder.Append(IMPASSABLE_TEXT);
-        }
+        _tileNameText.text = terrain.TileName;
+        _moveCostText.text = terrain.IsMoveAvailable ? $"{terrain.RequireMove}" : IMPASSABLE_TEXT;
 
-        if (_unitGenerator.TryGetUnitAtSection(_lastSection, out MapUnit unit))
+        bool hasUnit = _unitGenerator.TryGetUnitAtSection(_lastSection, out MapUnit unit);
+        SetUnitInfoActive(hasUnit);
+        if (hasUnit)
         {
             UnitData data = unit.SelectUnitData;
-            _infoBuilder.Append('\n').Append(data.UnitName).Append(" [").Append(data.TeamSide).Append(']');
-            _infoBuilder.Append('\n').Append("HP ").Append(unit.CurrentHp).Append(" / ").Append(data.MaxHealth);
-            _infoBuilder.Append("   EN ").Append(unit.CurrentEn).Append(" / ").Append(data.MaxEnergy);
+            _unitNameText.text = data.UnitName;
+            _teamText.text = data.TeamSide;
+            _hpText.text = $"HP {unit.CurrentHp} / {data.MaxHealth}";
+            _enText.text = $"EN {unit.CurrentEn} / {data.MaxEnergy}";
         }
 
-        _hoverInfoText.SetText(_infoBuilder);
         _hoverInfoPanel.SetActive(true);
+    }
+
+    // 유닛 정보 텍스트를 개별로 켜고 끔. 꺼진 텍스트는 Layout Group 배치에서 빠짐
+    private void SetUnitInfoActive(bool isActive)
+    {
+        _unitNameText.gameObject.SetActive(isActive);
+        _teamText.gameObject.SetActive(isActive);
+        _hpText.gameObject.SetActive(isActive);
+        _enText.gameObject.SetActive(isActive);
     }
 }

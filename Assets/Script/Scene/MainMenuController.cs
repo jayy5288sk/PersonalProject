@@ -6,7 +6,7 @@ public class MainMenuController : MonoBehaviour
 {
     private const int FIRST_STAGE_INDEX = 0;
     private const int SECOND_STAGE_INDEX = 1;
-    
+
     [SerializeField] private GameObject _mainPanel;
     [SerializeField] private GameObject _stageSelectPanel;
     [SerializeField] private Button _gameStartButton;
@@ -14,7 +14,7 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] private Button _backButton;
     [SerializeField] private Button _firstStageButton;
     [SerializeField] private Button _secondStageButton;
-    
+
     private void Awake()
     {
         // 시작 시에는 메인 패널만

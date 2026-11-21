@@ -28,6 +28,9 @@ public class EnemyAIController : MonoBehaviour
 
     public event Action OnEnemyTurnCompleted;
 
+    // 추가: 적 한 기가 행동을 시작할 때 알림 (카메라 시점 이동용)
+    public event Action<MapUnit> OnEnemyActionStarted;
+
     private void Awake() => Init();
 
     public void StartEnemyTurn()
@@ -44,9 +47,13 @@ public class EnemyAIController : MonoBehaviour
     {
         // 이동하면 칸 목록이 바뀌므로 목록을 먼저 복사해 두고 순회
         _unitGenerator.GetUnitsByTeam(TeamSide.ENEMY, _enemyUnits);
+        // 추가: 이동력이 높은 적부터 행동
+        _enemyUnits.Sort(CompareByMovementDescending);
 
         foreach (MapUnit enemy in _enemyUnits)
         {
+            // 추가: 카메라가 먼저 이동하고, 기존 대기 시간 뒤에 행동
+            OnEnemyActionStarted?.Invoke(enemy);
             yield return _actionWait;
             ActEnemy(enemy);
             enemy.CompleteUnitAction();
@@ -213,6 +220,12 @@ public class EnemyAIController : MonoBehaviour
         {
             _unitGenerator.MoveUnitToSection(enemy, destination);
         }
+    }
+
+    // 추가: 이동력 내림차순 정렬 기준
+    private static int CompareByMovementDescending(MapUnit a, MapUnit b)
+    {
+        return b.SelectUnitData.MovementPoints.CompareTo(a.SelectUnitData.MovementPoints);
     }
 
     private void Init()

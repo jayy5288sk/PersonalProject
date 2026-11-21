@@ -1013,7 +1013,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6276951344735513741, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
       propertyPath: m_text
-      value: Metal Reigns
+      value: METAL REIGNS
       objectReference: {fileID: 0}
     - target: {fileID: 9156326950715031075, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
       propertyPath: m_fontStyle

@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: MegaBarrelData
   m_EditorClassIdentifier: Assembly-CSharp::UnitData
   _id: 2
-  _unitName: 
-  _maxHealth: 0
-  _maxEnergy: 0
-  _movementPoints: 0
-  _basicWeapon: 
-  _expandedWeapon: 
-  _teamSide: 
-  _unitPrefab: {fileID: 1653135108486208113, guid: 82feb3440d873464d8484f6e395476fa, type: 3}
+  _unitName: MegaBarrel
+  _maxHealth: 150
+  _maxEnergy: 100
+  _movementPoints: 4
+  _basicWeapon: 3
+  _expandedWeapon: 4
+  _teamSide: Ally
+  _unitPrefab: {fileID: 1322518295314228139, guid: 3e4276befb50804478b7ed0ec2f4f712, type: 3}

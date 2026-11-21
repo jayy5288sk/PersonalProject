@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: HunterKillerData
   m_EditorClassIdentifier: Assembly-CSharp::UnitData
   _id: 1
-  _unitName: 
-  _maxHealth: 0
-  _maxEnergy: 0
-  _movementPoints: 0
-  _basicWeapon: 
-  _expandedWeapon: 
-  _teamSide: 
-  _unitPrefab: {fileID: 7034231655582412588, guid: 1b9c69a69b0bda74c8abcde0d7d811bf, type: 3}
+  _unitName: HunterKiller
+  _maxHealth: 200
+  _maxEnergy: 80
+  _movementPoints: 5
+  _basicWeapon: 1
+  _expandedWeapon: 2
+  _teamSide: Ally
+  _unitPrefab: {fileID: 4285252581816289979, guid: cabcde46c4488cd4caeecab484b79133, type: 3}

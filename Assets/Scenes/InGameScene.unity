@@ -1303,6 +1303,18 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3247019741207926362, guid: 598faeabb397d664b8d07cb7dc7eec0b, type: 3}
+      propertyPath: m_fontSize
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 3247019741207926362, guid: 598faeabb397d664b8d07cb7dc7eec0b, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 16
+      objectReference: {fileID: 0}
+    - target: {fileID: 3247019741207926362, guid: 598faeabb397d664b8d07cb7dc7eec0b, type: 3}
+      propertyPath: m_overflowMode
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 5271662594964255664, guid: 598faeabb397d664b8d07cb7dc7eec0b, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -1414,6 +1426,18 @@ PrefabInstance:
     - target: {fileID: 6986147672765406351, guid: 598faeabb397d664b8d07cb7dc7eec0b, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7584321847548191033, guid: 598faeabb397d664b8d07cb7dc7eec0b, type: 3}
+      propertyPath: m_fontSize
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 7584321847548191033, guid: 598faeabb397d664b8d07cb7dc7eec0b, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 7584321847548191033, guid: 598faeabb397d664b8d07cb7dc7eec0b, type: 3}
+      propertyPath: m_overflowMode
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3308,6 +3332,14 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1844608340855409284, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
+      propertyPath: m_overflowMode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2387808362080193885, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
+      propertyPath: m_overflowMode
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 3216659987777331482, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -3331,6 +3363,14 @@ PrefabInstance:
     - target: {fileID: 3216659987777331482, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3349117752968261017, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
+      propertyPath: m_overflowMode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4017194414671955765, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
+      propertyPath: m_overflowMode
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4471183600057203331, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
       propertyPath: m_SizeDelta.y
@@ -3464,6 +3504,18 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5171199462152409940, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
+      propertyPath: m_overflowMode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5703448317098638814, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
+      propertyPath: m_overflowMode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6016812889878863572, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
+      propertyPath: m_overflowMode
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 6308418882983917258, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -3511,10 +3563,26 @@ PrefabInstance:
     - target: {fileID: 6555797717780055582, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7256313673182532371, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
+      propertyPath: m_overflowMode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7325625929608672457, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
+      propertyPath: m_overflowMode
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7806247039681926536, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
       propertyPath: m_Name
       value: HoverInfoPanel
+      objectReference: {fileID: 0}
+    - target: {fileID: 8075609562827915358, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
+      propertyPath: m_overflowMode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8354360654417473622, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
+      propertyPath: m_overflowMode
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 9208695135832338170, guid: b05ae00bb1fa28c4ba47794ebeaf0db0, type: 3}
       propertyPath: m_AnchorMax.y

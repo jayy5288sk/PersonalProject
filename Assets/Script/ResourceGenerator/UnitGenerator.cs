@@ -6,7 +6,7 @@ using UnityEngine;
 public class UnitGenerator : MonoBehaviour
 {
     private const float UNIT_SPAWNPOINT_SIZE = 1f; // MapGenerator의 TERRAIN_SIZE와 같아야 한다.
-    private const float UNIT_SPAWN_Y_POSITION = 1f; // 임시 상수. 유닛 배치 시 높이.
+    private const float UNIT_SPAWN_Y_POSITION = 0.5f; // 임시 상수. 유닛 배치 시 높이.
     
     [SerializeField] private UnitDataLoader _unitDataLoader;
     [SerializeField] private WeaponDataLoader _weaponDataLoader;

@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: IronGuardData
   m_EditorClassIdentifier: Assembly-CSharp::UnitData
   _id: 4
-  _unitName: 
-  _maxHealth: 0
-  _maxEnergy: 0
-  _movementPoints: 0
-  _basicWeapon: 
-  _expandedWeapon: 
-  _teamSide: 
-  _unitPrefab: {fileID: 5158747264177038026, guid: 6af46204d293c564a87213cedcf41030, type: 3}
+  _unitName: IronGuard
+  _maxHealth: 200
+  _maxEnergy: 70
+  _movementPoints: 4
+  _basicWeapon: 7
+  _expandedWeapon: 8
+  _teamSide: Enemy
+  _unitPrefab: {fileID: 4248787605350367419, guid: 78eac4237b0479841bb907c282b9a22c, type: 3}

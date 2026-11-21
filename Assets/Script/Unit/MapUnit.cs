@@ -4,13 +4,10 @@ using UnityEngine;
 
 public class MapUnit : MonoBehaviour, IDamageable, IEnergyUsable
 {
-    private const float ACTION_DONE_BRIGHTNESS = 0.4f;
-    
     [SerializeField] private UnitData _selectUnitData;
     [SerializeField] private Vector2Int _sectionUnitPos;
-    
-    private Renderer _renderer;
-    private Color _originalColor;
+
+    private UnitActionTint _actionTint;
 
     private readonly List<WeaponData> _weaponDataList = new();
     
@@ -42,16 +39,13 @@ public class MapUnit : MonoBehaviour, IDamageable, IEnergyUsable
     public void CompleteUnitAction()
     {
         IsUnitActionDone = true;
-        _renderer.material.color = new Color(_originalColor.r * ACTION_DONE_BRIGHTNESS,
-                                             _originalColor.g * ACTION_DONE_BRIGHTNESS,
-                                             _originalColor.b * ACTION_DONE_BRIGHTNESS,
-                                             ACTION_DONE_BRIGHTNESS);
+        _actionTint.SetActionDone(true);
     }
 
     public void ResetUnitAction()
     {
         IsUnitActionDone = false;
-        _renderer.material.color = _originalColor;
+        _actionTint.SetActionDone(false);
     }
 
     public void TakeDamage(float damage)
@@ -66,8 +60,7 @@ public class MapUnit : MonoBehaviour, IDamageable, IEnergyUsable
 
     private void Init()
     {
-        _renderer = GetComponent<Renderer>();
-        _originalColor = _renderer.material.color;
+        _actionTint = GetComponent<UnitActionTint>();
     }
     
     // 시작 시, List 및 체력, 에너지 초기화

@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: HammerShockData
   m_EditorClassIdentifier: Assembly-CSharp::UnitData
   _id: 3
-  _unitName: 
-  _maxHealth: 0
-  _maxEnergy: 0
-  _movementPoints: 0
-  _basicWeapon: 
-  _expandedWeapon: 
-  _teamSide: 
-  _unitPrefab: {fileID: 5158747264177038026, guid: 476e6403230f6da488cde6d36bb74756, type: 3}
+  _unitName: HammerShock
+  _maxHealth: 300
+  _maxEnergy: 50
+  _movementPoints: 3
+  _basicWeapon: 5
+  _expandedWeapon: 6
+  _teamSide: Ally
+  _unitPrefab: {fileID: 349896408683627011, guid: 0e9f132cd689a874589d5ff8eef87eae, type: 3}

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3572510334757194010}
   - component: {fileID: 275778687914169119}
+  - component: {fileID: 4706365695970345230}
   m_Layer: 0
   m_Name: MainMenuController
   m_TagString: Untagged
@@ -51,3 +52,21 @@ MonoBehaviour:
   _backButton: {fileID: 0}
   _firstStageButton: {fileID: 0}
   _secondStageButton: {fileID: 0}
+--- !u!114 &4706365695970345230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8496237279066920482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dbc665ed406f594280f8b73505eacb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SoundSettingsHUD
+  _audioMixer: {fileID: 24100000, guid: 6ce16bc32275a7249aa8bc5c85410021, type: 2}
+  _settingsPanel: {fileID: 0}
+  _bgmSlider: {fileID: 0}
+  _sfxSlider: {fileID: 0}
+  _openButton: {fileID: 0}
+  _closeButton: {fileID: 0}

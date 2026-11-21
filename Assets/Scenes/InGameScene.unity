@@ -1339,6 +1339,38 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 160789832547833786, guid: 9aaee2b8e86215747a6fd1654aa99aaa, type: 3}
+      propertyPath: _units.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 160789832547833786, guid: 9aaee2b8e86215747a6fd1654aa99aaa, type: 3}
+      propertyPath: '_units.Array.data[4]'
+      value: 
+      objectReference: {fileID: 11400000, guid: a11c931de2d4bf44b8494be4bc0a5094, type: 2}
+    - target: {fileID: 160789832547833786, guid: 9aaee2b8e86215747a6fd1654aa99aaa, type: 3}
+      propertyPath: '_units.Array.data[5]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 1947f70ca51012b4c9d1a36baf6274f7, type: 2}
+    - target: {fileID: 1937212587853195743, guid: 9aaee2b8e86215747a6fd1654aa99aaa, type: 3}
+      propertyPath: _weapons.Array.size
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 1937212587853195743, guid: 9aaee2b8e86215747a6fd1654aa99aaa, type: 3}
+      propertyPath: '_weapons.Array.data[8]'
+      value: 
+      objectReference: {fileID: 11400000, guid: ac64493dc5479e2408968281fa23c76b, type: 2}
+    - target: {fileID: 1937212587853195743, guid: 9aaee2b8e86215747a6fd1654aa99aaa, type: 3}
+      propertyPath: '_weapons.Array.data[9]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 1a90f2de4d787fe41b2a65b66ccb5283, type: 2}
+    - target: {fileID: 1937212587853195743, guid: 9aaee2b8e86215747a6fd1654aa99aaa, type: 3}
+      propertyPath: '_weapons.Array.data[10]'
+      value: 
+      objectReference: {fileID: 11400000, guid: d52ae5d024afeb742a04edac75dcce06, type: 2}
+    - target: {fileID: 1937212587853195743, guid: 9aaee2b8e86215747a6fd1654aa99aaa, type: 3}
+      propertyPath: '_weapons.Array.data[11]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 4828817440225694d9d03deade1a8f04, type: 2}
     - target: {fileID: 2741112408897058872, guid: 9aaee2b8e86215747a6fd1654aa99aaa, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

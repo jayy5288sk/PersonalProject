@@ -7,7 +7,7 @@ public class MapUnit : MonoBehaviour, IDamageable, IEnergyUsable
     [SerializeField] private UnitData _selectUnitData;
     [SerializeField] private Vector2Int _sectionUnitPos;
 
-    private UnitActionTint _actionTint;
+    private UnitActionTint _actionTint; // 기본 도형이 아니므로 Color만으로 불가
 
     private readonly List<WeaponData> _weaponDataList = new();
     
@@ -23,7 +23,7 @@ public class MapUnit : MonoBehaviour, IDamageable, IEnergyUsable
     public int CurrentHp { get; private set; }
     public int CurrentEn { get; private set; }
 
-    private void Awake() => Init();
+    private void Awake() => InitColor();
     
     public void SetUnitData(UnitData unitData, Vector2Int sectionUnitPos)
     {
@@ -39,12 +39,14 @@ public class MapUnit : MonoBehaviour, IDamageable, IEnergyUsable
     public void CompleteUnitAction()
     {
         IsUnitActionDone = true;
+        // color를 통한 RGBA 값 조절에서 변경
         _actionTint.SetActionDone(true);
     }
 
     public void ResetUnitAction()
     {
         IsUnitActionDone = false;
+        // color를 통한 RGBA 값 조절에서 변경
         _actionTint.SetActionDone(false);
     }
 
@@ -58,7 +60,7 @@ public class MapUnit : MonoBehaviour, IDamageable, IEnergyUsable
         CurrentEn = Mathf.Max(0, (int)Math.Round(CurrentEn - amount));
     }
 
-    private void Init()
+    private void InitColor()
     {
         _actionTint = GetComponent<UnitActionTint>();
     }

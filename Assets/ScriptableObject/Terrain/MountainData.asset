@@ -16,4 +16,4 @@ MonoBehaviour:
   _tileName: 
   _isMoveAvailable: 0
   _requireMove: 0
-  _tilePrefab: {fileID: 1189827448020442738, guid: 3c3181ca68b6c7d4abaa0c77d82ca2c0, type: 3}
+  _tilePrefab: {fileID: 569763826987369653, guid: 6a2a09adc801ac0429bf07bdb6c4644c, type: 3}

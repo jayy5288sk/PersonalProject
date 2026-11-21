@@ -17,7 +17,24 @@ public class WeaponData : ScriptableObject
     public int AttackDamage => _attackDamage;
     public int MinRange => _minRange;
     public int MaxRange => _maxRange;
-    public string RangeShape => _rangeShape;
+    public AttackShape RangeShape
+    {
+        get
+        {
+            switch (_rangeShape)
+            {
+                case "Single":
+                    return AttackShape.Single;
+                case "Area":
+                    return AttackShape.Area;
+                case "Pierce":
+                    return AttackShape.Pierce;
+                default:
+                    Debug.LogError($"{_weaponName}: 알 수 없는 무기형 {_rangeShape}");
+                    return AttackShape.Single;
+            }
+        }
+    }
     public int RequireEn => _requireEn;
 
     public void SetData(int id, string weaponName, int attackDamage, int minRange,

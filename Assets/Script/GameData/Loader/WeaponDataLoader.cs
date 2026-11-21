@@ -169,4 +169,19 @@ public class WeaponDataLoader : MonoBehaviour
             }
         }
     }
+    
+    /// <summary>
+    /// 무기 ID로 무기 찾기
+    /// </summary>
+    public bool TryGetWeaponById(int id, out WeaponData weapon)
+    {
+        if (_weaponDataById.TryGetValue(id, out weapon))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }

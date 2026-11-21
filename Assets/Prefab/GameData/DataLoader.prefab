@@ -93,6 +93,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 19b5f96b38a538047b6c6687abe8a8b0, type: 2}
   - {fileID: 11400000, guid: 3b5c99ad94bce3a48bc36b54a12ff699, type: 2}
   - {fileID: 11400000, guid: b3571afe1364f344284ece7d3a8fcb98, type: 2}
+  - {fileID: 11400000, guid: 9a3ce19cc9e63c14aa89f719c9721c81, type: 2}
 --- !u!1 &2784214036801862280
 GameObject:
   m_ObjectHideFlags: 0
@@ -195,6 +196,52 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9fc5b05ea8fab1343a54409c9d345f38, type: 2}
   - {fileID: 11400000, guid: ffd7d8d1a52c5c34998a13a54248c057, type: 2}
   - {fileID: 11400000, guid: 1e71e0c27bfa0ce4ba63ef36c29f4a87, type: 2}
+  - {fileID: 11400000, guid: 96b7fd62875df3c48aed87cc7c500b9f, type: 2}
+  - {fileID: 11400000, guid: 77cf0c4422635004a98c77ec37e52a00, type: 2}
+--- !u!1 &6054717934976525933
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6725206263451905786}
+  - component: {fileID: 7440125217026336252}
+  m_Layer: 0
+  m_Name: UnitSpawnDataLoader
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6725206263451905786
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6054717934976525933}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2741112408897058872}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7440125217026336252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6054717934976525933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e3c65d000b791a429061d75e2989b96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitSpawnDataLoader
 --- !u!1 &6164395018762588791
 GameObject:
   m_ObjectHideFlags: 0
@@ -229,6 +276,7 @@ Transform:
   - {fileID: 9163733423888001383}
   - {fileID: 5347391989595287910}
   - {fileID: 145900388006395448}
+  - {fileID: 6725206263451905786}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5379219458991155985
@@ -243,8 +291,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2266b97eaac10340a9d85735485d77f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HeadDataLoader
+  _stages:
+  - {fileID: 11400000, guid: 48e1cd223fdc7e8428d76f0455e4b08b, type: 2}
+  - {fileID: 11400000, guid: 8597324c066974642838473b5ef91578, type: 2}
   _unitDataLoader: {fileID: 160789832547833786}
   _weaponDataLoader: {fileID: 1937212587853195743}
   _terrainDataLoader: {fileID: 8403373362854386925}
   _mapDesignDataLoader: {fileID: 4791265343919978130}
-  _mapGenerator: {fileID: 2649369796044933556, guid: e6a38f201936fb64087a0ea817535e6d, type: 3}
+  _mapGenerator: {fileID: 0}
+  _unitSpawnDataLoader: {fileID: 7440125217026336252}
+  _unitGenerator: {fileID: 0}

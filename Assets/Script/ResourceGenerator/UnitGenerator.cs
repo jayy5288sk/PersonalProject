@@ -1,13 +1,24 @@
+using System;
+using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 public class UnitGenerator : MonoBehaviour
 {
-    [SerializeField] private UnitDataLoader _unitDataLoader;
-
     private const float UNIT_SPAWNPOINT_SIZE = 1f; // MapGenerator의 TERRAIN_SIZE와 같아야 한다.
-    private const float UNIT_SPAWN_Y_POSITION = 1.7f; // 임시 상수. 유닛 배치 시 높이.
+    private const float UNIT_SPAWN_Y_POSITION = 0.5f; // 임시 상수. 유닛 배치 시 높이.
     
+    [SerializeField] private UnitDataLoader _unitDataLoader;
+    [SerializeField] private WeaponDataLoader _weaponDataLoader;
+
+    private Dictionary<Vector2Int, MapUnit> _unitsBySection = new();
+    private List<WeaponData> _weapons = new();
+    public IReadOnlyDictionary<Vector2Int, MapUnit> UnitsBySection => _unitsBySection;
+    private int _mapRowCount;
+
+    public event Action OnUnitPlacementCompleted;
+    public event Action<MapUnit> OnUnitDeath;
+
     public void PlacementUnit(JArray spawnArray, int unitSpawnArrayRow)
     {
         // 스폰 데이터를 불러오지 못한 경우. 원인 로그는 UnitSpawnDataLoader 쪽에서 출력
@@ -15,6 +26,8 @@ public class UnitGenerator : MonoBehaviour
         {
             return;
         }
+        
+        _mapRowCount = unitSpawnArrayRow;
 
         int spawnRowCount = spawnArray.Count;
         int columnCount = ((JArray)spawnArray[0]).Count;
@@ -23,8 +36,10 @@ public class UnitGenerator : MonoBehaviour
         {
             for (int j = 0; j < columnCount; j++)
             {
-                int currentID = spawnArray[i][j].Value<int>(); // 배치될 유닛의 ID
+                JToken spawnCell = spawnArray[i][j];
+                int currentID = spawnCell[UnitSpawnDataLoader.SPAWN_ID_KEY].Value<int>(); // 배치될 유닛의 ID
                 GameObject currentUnit; // 배치될 유닛
+                GameObject mapSpawnUnit; // 정보를 받을 유닛
                 
                 if (_unitDataLoader.TryGetUnitData(currentID, out UnitData unitData))
                 {
@@ -36,18 +51,103 @@ public class UnitGenerator : MonoBehaviour
                 }
                 
                 // 유닛 설치 위치
-                Vector3 position = new Vector3(j * UNIT_SPAWNPOINT_SIZE, UNIT_SPAWN_Y_POSITION,
-                                              (unitSpawnArrayRow - 1 - i) * UNIT_SPAWNPOINT_SIZE);
+                Vector2Int unitSpawnPos = new Vector2Int(j, i);
+                Vector3 position = SectionToUnitPosition(unitSpawnPos);
                 
                 // 위치에 설치 (예외 처리 포함)
                 if (currentUnit == null)
                 {
-                    Debug.LogError($"유닛 {currentID} 프리팹이 빠졌다");
+                    Debug.LogError($"ID {currentID}번 유닛 프리팹이 빠졌다");
                     continue;
                 }
                 
-                Instantiate(currentUnit, position, Quaternion.identity, transform);
+                mapSpawnUnit = Instantiate(currentUnit, position, Quaternion.identity, transform);
+                
+                MapUnit tempUnit = mapSpawnUnit.AddComponent<MapUnit>();
+                tempUnit.SetUnitData(unitData, unitSpawnPos);
+                tempUnit.SetBehaviorType(
+                    (EnemyBehaviorType)spawnCell[UnitSpawnDataLoader.SPAWN_BEHAVIOR_KEY].Value<int>());
+
+                _weapons.Clear();
+                AddWeaponById(unitData.BasicWeapon, _weapons);
+                AddWeaponById(unitData.ExpandedWeapon, _weapons);
+                tempUnit.InitBattleStatus(_weapons);
+                _unitsBySection.Add(unitSpawnPos, tempUnit);
             }
+        }
+
+        OnUnitPlacementCompleted?.Invoke();
+    }
+
+    /// <summary>
+    /// 해당 진영의 유닛을 result에 채움. 호출하는 쪽의 리스트를 재사용
+    /// </summary>
+    public void GetUnitsByTeam(string teamSide, List<MapUnit> result)
+    {
+        result.Clear();
+        foreach (MapUnit unit in _unitsBySection.Values)
+        {
+            if (unit.SelectUnitData.TeamSide == teamSide)
+            {
+                result.Add(unit);
+            }
+        }
+    }
+    
+    /// <summary>
+    /// 구역에 해당하는 유닛을 가져오기 위한 정보를 주는 함수
+    /// </summary>
+    public bool TryGetUnitAtSection(Vector2Int section, out MapUnit mapUnit)
+    {
+        if (_unitsBySection.TryGetValue(section, out mapUnit))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private Vector3 SectionToUnitPosition(Vector2Int section)
+    {
+        float x = section.x * UNIT_SPAWNPOINT_SIZE; 
+        float y = UNIT_SPAWN_Y_POSITION;
+        float z = (_mapRowCount - 1 - section.y) * UNIT_SPAWNPOINT_SIZE; 
+
+        return new Vector3(x, y, z);
+    }
+
+    public void MoveUnitToSection(MapUnit mapUnit, Vector2Int section)
+    {
+        Vector2Int prevPos = mapUnit.SectionUnitPos;
+        _unitsBySection.Remove(prevPos);
+        _unitsBySection.Add(section, mapUnit);
+        mapUnit.SetUnitData(mapUnit.SelectUnitData, section);
+        mapUnit.transform.position = SectionToUnitPosition(section);
+    }
+
+    /// <summary>
+    /// 격파된 유닛을 칸 목록에서 빼고 오브젝트 파괴. 이후 선택·공격 대상에서 제외된다
+    /// </summary>
+    public void RemoveUnit(MapUnit mapUnit)
+    {
+        _unitsBySection.Remove(mapUnit.SectionUnitPos);
+        OnUnitDeath?.Invoke(mapUnit);
+        Destroy(mapUnit.gameObject);
+    }
+
+    private void AddWeaponById(int weaponId, List<WeaponData> result)
+    {
+        bool isWeaponExist = _weaponDataLoader.TryGetWeaponById(weaponId, out WeaponData weapon);
+        
+        if(isWeaponExist)
+        {
+            result.Add(weapon);
+        }
+        else
+        {
+            Debug.LogError($"ID {weaponId}번 무장 검색 실패");
         }
     }
 }

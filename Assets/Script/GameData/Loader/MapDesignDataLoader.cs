@@ -6,23 +6,19 @@ using Newtonsoft.Json.Linq;
 
 public class MapDesignDataLoader : MonoBehaviour
 {
-    private string _mapTsvUrl = SECOND_STAGE_MAP;
-    
     private const int INVALID_TERRAIN_ID = -1;
-    private const string FIRST_STAGE_MAP = "https://docs.google.com/spreadsheets/d/1IdpHrRG9OCjbC6euPdm8ktoVfJ6e3ZHGoZg01Jqd9Gc/export?format=tsv&gid=212403317";
-    private const string SECOND_STAGE_MAP = "https://docs.google.com/spreadsheets/d/1IdpHrRG9OCjbC6euPdm8ktoVfJ6e3ZHGoZg01Jqd9Gc/export?format=tsv&gid=1450338949";
     
     public JArray MapArray { get; private set; }
 
-    public IEnumerator LoadMapTable()
+    public IEnumerator LoadMapTable(string mapTsvUrl)
     {
-        if (_mapTsvUrl == null || _mapTsvUrl.Trim() == "") 
+        if (string.IsNullOrWhiteSpace(mapTsvUrl)) 
         {
             Debug.Log("맵 디자인 URL이 비어있다");
             yield break;
         }
         
-        using (UnityWebRequest unityWebRequest = UnityWebRequest.Get(_mapTsvUrl))
+        using (UnityWebRequest unityWebRequest = UnityWebRequest.Get(mapTsvUrl))
         {
             // 요청이 완료될 때까지 대기
             yield return unityWebRequest.SendWebRequest();

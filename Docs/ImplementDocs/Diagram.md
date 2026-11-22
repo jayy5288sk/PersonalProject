@@ -3,7 +3,7 @@
 >
 > 점선은 미구현 흐름을 나타낸다.
 
-## 씬 흐름·스테이지 선택 (F-03, F-10, F-11, F-12)
+## 씬 흐름·스테이지 선택 (F-03, F-10, F-11, F-12, F-13)
 
 ```mermaid
 flowchart TB
@@ -11,8 +11,11 @@ flowchart TB
         direction TB
         Main["<b>MainPanel</b><br/>게임 시작 · 종료"]
         Select["<b>StageSelectPanel</b><br/>Stage 1 · Stage 2 · Back"]
+        Option["<b>Option 패널</b> (SoundSettingsHUD)<br/>BGM · SE 볼륨<br/>→ 사운드 설정 참고"]
+        MBgm["<b>MainMenuBGM</b><br/>AudioSource (Loop)"]
         Main -->|게임 시작| Select
         Select -->|Back| Main
+        Main -->|열기 · 닫기| Option
     end
 
     Sel[("<b>StageSelection</b> (static)<br/>SelectedStageIndex<br/>씬을 바꿔도 유지")]
@@ -23,6 +26,7 @@ flowchart TB
         Fight["전투 진행"]
         Result["<b>BattleResultHUD</b><br/>결과 패널"]
         Pause["<b>PauseHUD</b><br/>일시정지 패널"]
+        IBgm["인게임 BGM<br/>AudioSource (Loop)"]
         Head --> Fight
         Fight -.->|OnBattleResult| Result
         Fight -->|Esc · 일시정지 버튼| Pause
@@ -156,7 +160,7 @@ flowchart LR
     Skip["그 칸 건너뜀"]
     Err["에러 로그 후<br/>그 칸 건너뜀"]
     Spawn["<b>Instantiate</b><br/>SectionToUnitPosition()<br/>UnitGenerator의 자식으로 생성"]
-    MU["<b>MapUnit</b><br/>AddComponent 즉시 Awake:<br/>Renderer·원래 색 저장<br/>SetUnitData(UnitData, 칸)<br/>SetBehaviorType(행동 유형, F-08)"]
+    MU["<b>MapUnit</b><br/>AddComponent 즉시 Awake:<br/>InitColor() → 프리팹의 UnitActionTint 가져오기<br/>SetUnitData(UnitData, 칸)<br/>SetBehaviorType(행동 유형, F-08)"]
     Dict["<b>유닛 사전</b><br/>UnitsBySection<br/>칸 → MapUnit"]
     Done(["OnUnitPlacementCompleted"])
     Phase["<b>PhaseManager</b><br/>첫 아군 페이즈 시작 (F-04)"]
@@ -200,12 +204,18 @@ flowchart LR
     Evt(["OnMapGenerateCompleted"])
     Sel["<b>TileSelector</b><br/>HandleMapGenerated()<br/>MapGenerator.GroundHeight 높이에 바닥 평면 생성"]
     Cam["<b>CameraView</b><br/>HandleMapGenerated()<br/>이동 범위 (0,0) ~ ((열-1)×칸, (행-1)×칸)"]
+    PM["<b>PhaseManager</b>"]
+    AI["<b>EnemyAIController</b>"]
 
     Head -->|MapArray 전달| Gen
     Gen -->|타일 설치 후 발생| Evt
     Evt -->|구독| Sel
     Evt -->|구독| Cam
+    PM -.->|"OnPhaseChanged<br/>(자동 시점 이동)"| Cam
+    AI -.->|"OnEnemyActionStarted<br/>(자동 시점 이동)"| Cam
 ```
+
+> 자동 시점 이동은 `카메라 이동` 다이어그램 참고. 아군 목록은 `UnitGenerator.GetUnitsByTeam()`으로 얻는다.
 
 ### 칸 강조 처리 순서 (TileSelector, 매 프레임)
 
@@ -257,7 +267,7 @@ flowchart TB
     subgraph Show["표시"]
         direction LR
         Disp["<b>UnitSelectDisplay</b><br/>바닥 테두리 + 머리 위 마커"]
-        MU["<b>MapUnit</b><br/>행동 완료 · 어둡게<br/>HP · EN"]
+        MU["<b>MapUnit</b><br/>행동 완료 · HP · EN<br/>→ <b>UnitActionTint</b>.SetActionDone()<br/>어둡게 / 원래 색"]
         Range["<b>MoveRangeDisplay</b><br/>이동 범위 숫자"]
         ARange["<b>AttackRangeDisplay</b><br/>공격 범위 빨간 칸"]
     end
@@ -457,8 +467,11 @@ flowchart LR
 ```mermaid
 flowchart TB
     Start["StartEnemyTurn()<br/>(EnemyPhase 들어가기)"] --> Copy["GetUnitsByTeam(ENEMY)<br/>적 목록 복사"]
-    Copy --> Loop{"남은 적?"}
-    Loop -->|예| Wait["대기 _actionDelay"]
+    Copy --> Sort["CompareByMovementDescending<br/>이동력 내림차순 정렬"]
+    Sort --> Loop{"남은 적?"}
+    Loop -->|예| Focus(["OnEnemyActionStarted(적)"])
+    Focus -.->|구독| Cam["<b>CameraView</b><br/>그 적으로 시점 이동"]
+    Focus --> Wait["대기 _actionDelay"]
     Wait --> Act["ActEnemy()"]
     Act --> Done["CompleteUnitAction()"]
     Done --> Loop
@@ -568,6 +581,30 @@ flowchart TB
 
 > `timeScale = 0`이 멈추는 것: 적 행동 대기(`WaitForSeconds`), 카메라 이동(`deltaTime`). 멈추지 않는 것: `Update()`, 입력. 그래서 패널 배경 Image가 Raycast를 받아 칸 클릭(`TileSelector._isPointerOverUI`)과 뒤쪽 버튼을 막는다.
 
+## 사운드 설정 (F-13)
+
+```mermaid
+flowchart LR
+    subgraph HUD["SoundSettingsHUD (MainMenuScene)"]
+        direction TB
+        Load["Start: LoadVolumes()<br/>패널 끄기<br/>PlayerPrefs.GetFloat(키, 1)<br/>Slider.SetValueWithoutNotify()"]
+        Change["Slider onValueChanged<br/>ChangeVolume()<br/>PlayerPrefs.SetFloat()"]
+        Close["닫기 버튼<br/>PlayerPrefs.Save()<br/>패널 끄기"]
+        Apply["ApplyVolume()<br/>Max(값, 0.0001)<br/>Log10(값) × 20 = dB"]
+        Load --> Apply
+        Change --> Apply
+    end
+
+    Apply -->|"SetFloat(BGMVolume · SFXVolume)"| Mixer["<b>MainMixer</b><br/>Exposed Parameter<br/>BGM 그룹 · SFX 그룹"]
+    MBgm["MainMenuBGM<br/>AudioSource"] -->|출력| Mixer
+    IBgm["인게임 BGM<br/>AudioSource"] -->|출력| Mixer
+    Pause(["TimeManager.OnPauseChanged"]) -.->|미구현| Mixer
+```
+
+> `PlayerPrefs` 키는 Exposed Parameter 이름과 같다. `AudioMixer.SetFloat`은 `Awake`에서 적용되지 않아 `Start`에서 불러온다.
+
+> SFX 그룹으로 출력하는 AudioSource는 아직 없다. 볼륨 불러오기는 메인 메뉴에만 있어, 인게임 씬을 바로 실행했을 때 저장값 적용 여부는 미검증이다.
+
 ## 인게임 UI (F-10, F-07)
 
 ### 구독 구조
@@ -581,6 +618,11 @@ flowchart LR
     SM["<b>StateManager</b>"] -.->|"OnStateChanged"| HI
     SM -.->|"OnStateChanged"| BF
     BF -->|"TryGetForecastTargets()<br/>SelectedUnit · SelectedWeapon"| SM
+    TS -.->|"OnPointedSectionChanged"| US["<b>UnitStatusHUD</b><br/>HP · EN · MV<br/>이동 · 공격 READY / DONE"]
+    SM -.->|"OnStateChanged"| US
+    PM -.->|"OnPhaseChanged"| US
+    US -->|"SelectedUnit · IsSelectedUnitMoved"| SM
+    US -->|"TryGetUnitAtSection()"| UG
     HI -->|"TerrainBySection"| MG["<b>MapGenerator</b>"]
     HI -->|"TryGetUnitAtSection()"| UG["<b>UnitGenerator</b>"]
 ```
@@ -619,6 +661,23 @@ flowchart LR
 ```
 
 > 맵 위 정보창들은 Raycast를 받지 않는다. 받으면 `TileSelector`가 UI 위로 판단해 칸 클릭이 무시된다.
+
+### 유닛 상태창 (UnitStatusHUD.Refresh)
+
+```mermaid
+flowchart LR
+    In["이벤트 수신<br/>(칸 변경이면 마지막 칸 저장)"] --> Sel{"<b>StateManager</b><br/>SelectedUnit 있음?"}
+    Sel -->|예| Unit["표시 유닛 = 선택 유닛"]
+    Sel -->|아니오| Pt{"마지막 칸이 (-1, -1)이 아니고<br/>TryGetUnitAtSection?"}
+    Pt -->|예| Unit2["표시 유닛 = 가리킨 유닛"]
+    Pt -->|아니오| Off["패널 끄기"]
+    Unit --> Gauge
+    Unit2 --> Gauge["ShowGauge()<br/>HP · EN fillAmount = 현재 / 최대<br/>텍스트 현재 / 최대, MV = 이동력"]
+    Gauge --> Act["ShowAction()<br/>공격 DONE = IsUnitActionDone<br/>이동 DONE = IsUnitActionDone<br/>또는 (선택 유닛 && IsSelectedUnitMoved)"]
+    Act --> On["패널 켜기"]
+```
+
+> 이동 여부는 `StateContext`에만 있어 선택 중인 유닛만 알 수 있다. 행동을 마친 유닛은 이동도 할 수 없으므로 함께 DONE으로 표시한다.
 
 ## 이동 범위 (F-05)
 
@@ -671,9 +730,31 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    Input["CameraMove<br/>WASD 2D Vector"] --> Dir["Pivot right·forward로<br/>월드 방향 변환"]
-    Dir --> Move["속도 × deltaTime 만큼 이동"]
-    Move --> Clamp["X·Z를 이동 범위로 제한"]
+    Gen{"맵 생성 완료?"} -->|아니오| Stop["무시"]
+    Gen -->|예| Input{"CameraMove<br/>WASD 입력 있음?"}
+    Input -->|예| Cancel["_isFocusing = false<br/>(자동 이동 취소)"]
+    Cancel --> Dir["Pivot right·forward로<br/>월드 방향 변환<br/>속도 × deltaTime 만큼 이동"]
+    Dir --> Clamp["ClampToMap()<br/>X·Z를 이동 범위로 제한"]
+    Input -->|아니오| Foc{"_isFocusing?"}
+    Foc -->|아니오| Stop
+    Foc -->|예| Smooth["MoveToFocus()<br/>SmoothDamp(목표, _focusSmoothTime)"]
+    Smooth --> Arrive{"거리²가 FOCUS_ARRIVE_SQR_DISTANCE 미만?"}
+    Arrive -->|예| Snap["목표 위치로 맞추고<br/>_isFocusing = false"]
     Clamp --> Pivot["<b>InGameCameraPivot</b><br/>위치 적용<br/>(자식 카메라 60° 기울기)"]
+    Smooth --> Pivot
     Edge["화면 가장자리 이동<br/>(미구현, P2)"] -.-> Dir
 ```
+
+### 자동 시점 이동 목표 설정 (CameraView.FocusOn)
+
+```mermaid
+flowchart LR
+    PM(["PhaseManager.OnPhaseChanged"]) --> Ally{"Ally 페이즈?"}
+    Ally -->|아니오| End["무시"]
+    Ally -->|예| Fast["TryGetFastestAlly()<br/>GetUnitsByTeam(ALLY)<br/>이동력 최대 (같으면 먼저 찾은 유닛)"]
+    AI(["EnemyAIController.OnEnemyActionStarted(적)"]) --> Focus
+    Fast -->|찾음| Focus["FocusOn(유닛 위치)<br/>높이 유지, X·Z만 교체<br/>ClampToMap() → _focusTarget<br/>_focusVelocity = 0, _isFocusing = true"]
+    Fast -->|없음| End
+```
+
+> 아군 페이즈는 시작 때만 비추고, 이후 시점은 플레이어가 조작한다. `deltaTime` 기반이라 일시정지 중에는 자동 이동도 멈춘다.

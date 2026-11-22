@@ -64,4 +64,4 @@
 | F-07 | 예상 결과 정리     | 라벨 공격자 → 피격자, 설명 HP 변화                 | `Assets/Script/UI/`           |
 
 ## TODO
-- 환경설정 패널과 BGM·SE 볼륨 + `PlayerPrefs` 저장 (F-13, 이슈 #22 DoD 3·9), 패널 3개가 되면 `ShowPanel(target)`로 통합, 통합 테스트 (DoD 10~12), `MainMenuController.PressedFirstButton`/`PressedSecondButton` 이름을 `Handle~Clicked`로 통일, `SHD_UI_TMP_SDF_Mobile.shader` include 수정은 `Assets/Imports/`(gitignore)라 로컬에만 있음
+- 패널 3개가 되면 `ShowPanel(target)`로 통합, 통합 테스트 (DoD 10~12), `MainMenuController.PressedFirstButton`/`PressedSecondButton` 이름을 `Handle~Clicked`로 통일, `SHD_UI_TMP_SDF_Mobile.shader` include 수정은 `Assets/Imports/`(gitignore)라 로컬에만 있음

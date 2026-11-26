@@ -6,6 +6,7 @@ public class MainMenuController : MonoBehaviour
 {
     private const int FIRST_STAGE_INDEX = 0;
     private const int SECOND_STAGE_INDEX = 1;
+    private const int THIRD_STAGE_INDEX = 2;
 
     [SerializeField] private GameObject _mainPanel;
     [SerializeField] private GameObject _stageSelectPanel;
@@ -14,6 +15,7 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] private Button _backButton;
     [SerializeField] private Button _firstStageButton;
     [SerializeField] private Button _secondStageButton;
+    [SerializeField] private Button _thirdStageButton;
 
     private void Awake()
     {
@@ -32,6 +34,7 @@ public class MainMenuController : MonoBehaviour
         _backButton.onClick.AddListener(HandleBackClicked);
         _firstStageButton.onClick.AddListener(PressedFirstButton);
         _secondStageButton.onClick.AddListener(PressedSecondButton);
+        _thirdStageButton.onClick.AddListener(PressedThirdButton);
     }
 
     private void UnbindEvents()
@@ -41,6 +44,7 @@ public class MainMenuController : MonoBehaviour
         _backButton.onClick.RemoveListener(HandleBackClicked);
         _firstStageButton.onClick.RemoveListener(PressedFirstButton);
         _secondStageButton.onClick.RemoveListener(PressedSecondButton);
+        _thirdStageButton.onClick.RemoveListener(PressedThirdButton);
     }
 
     // 게임 시작 버튼: 스테이지 선택 패널을 연다.
@@ -71,6 +75,11 @@ public class MainMenuController : MonoBehaviour
     private void PressedSecondButton()
     {
         StartStage(SECOND_STAGE_INDEX);
+    }
+
+    private void PressedThirdButton()
+    {
+        StartStage(THIRD_STAGE_INDEX);
     }
 
     private void StartStage(int stageIndex)

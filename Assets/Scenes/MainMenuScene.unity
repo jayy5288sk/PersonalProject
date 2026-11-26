@@ -727,6 +727,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 943854288}
     - target: {fileID: 275778687914169119, guid: 03c6de063390c684d8e7973b3d39b528, type: 3}
+      propertyPath: _thirdStageButton
+      value: 
+      objectReference: {fileID: 4777033094923422035}
+    - target: {fileID: 275778687914169119, guid: 03c6de063390c684d8e7973b3d39b528, type: 3}
       propertyPath: _secondStageButton
       value: 
       objectReference: {fileID: 1999274850}
@@ -838,6 +842,38 @@ PrefabInstance:
     - target: {fileID: 1771127715363182985, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2039384780233388640, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2039384780233388640, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2039384780233388640, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 620
+      objectReference: {fileID: 0}
+    - target: {fileID: 2039384780233388640, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -280
+      objectReference: {fileID: 0}
+    - target: {fileID: 2424791233403146004, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2424791233403146004, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2424791233403146004, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 2424791233403146004, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -280
       objectReference: {fileID: 0}
     - target: {fileID: 2917020664642769387, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
       propertyPath: m_AnchorMax.x
@@ -1015,6 +1051,26 @@ PrefabInstance:
       propertyPath: m_text
       value: METAL REIGNS
       objectReference: {fileID: 0}
+    - target: {fileID: 7688269238090941907, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8829860901466517388, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8829860901466517388, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8829860901466517388, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 1060
+      objectReference: {fileID: 0}
+    - target: {fileID: 8829860901466517388, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -280
+      objectReference: {fileID: 0}
     - target: {fileID: 9156326950715031075, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
       propertyPath: m_fontStyle
       value: 1
@@ -1046,6 +1102,17 @@ PrefabInstance:
 --- !u!114 &4777033094923422034 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3594296231081044592, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
+  m_PrefabInstance: {fileID: 4777033094923422033}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+--- !u!114 &4777033094923422035 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5858222157967896389, guid: 1038680f988dc91419c05ea295c64d49, type: 3}
   m_PrefabInstance: {fileID: 4777033094923422033}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
